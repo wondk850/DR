@@ -1,7 +1,6 @@
-import React, { useMemo } from 'react';
-import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+import React, { useMemo, useEffect, useState } from 'react';
+import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from 'recharts';
 import { UserProfile, AnswerRecord, ScoreBoard } from '../types';
-import { QUESTIONS } from '../constants';
 import { GoogleGenAI } from "@google/genai";
 
 interface Props {
@@ -11,10 +10,12 @@ interface Props {
 }
 
 const ResultScreen: React.FC<Props> = ({ profile, records, onRestart }) => {
-  // --- 1. Scoring Logic ---
+  // --- Scoring Logic ---
   const scores = useMemo(() => {
-    const board: ScoreBoard = { total: 0, vocab: 0, structure: 0, reading: 0, grammar: 0 };
-    const pointsPerQuestion = 5;
+    // Each question is worth 3.33 points roughly, or simplify to total points based on correct count
+    // But let's keep specific category buckets
+    const board: ScoreBoard = { total: 0, maxTotal: records.length * 5, vocab: 0, structure: 0, reading: 0, grammar: 0 };
+    const pointsPerQuestion = 5; // Simplified points per question for internal calc
 
     records.forEach(r => {
       if (r.isCorrect) {
@@ -28,272 +29,217 @@ const ResultScreen: React.FC<Props> = ({ profile, records, onRestart }) => {
     return board;
   }, [records]);
 
-  // --- 2. Grade Calculation ---
-  const grade = scores.total >= 80 ? 'A' : scores.total >= 50 ? 'B' : 'C';
-  const gradeColor = grade === 'A' ? 'text-green-600' : grade === 'B' ? 'text-yellow-600' : 'text-red-600';
+  // Convert to 100-point scale for display
+  const finalScore = Math.round((scores.total / scores.maxTotal) * 100);
+  
+  // Tier Calculation
+  let tier = 'Bronze';
+  let tierColor = 'text-amber-700 bg-amber-100 border-amber-300';
+  if (finalScore >= 95) { tier = 'Diamond'; tierColor = 'text-cyan-600 bg-cyan-50 border-cyan-200'; }
+  else if (finalScore >= 90) { tier = 'Platinum'; tierColor = 'text-indigo-600 bg-indigo-50 border-indigo-200'; }
+  else if (finalScore >= 80) { tier = 'Gold'; tierColor = 'text-yellow-600 bg-yellow-50 border-yellow-200'; }
+  else if (finalScore >= 70) { tier = 'Silver'; tierColor = 'text-gray-600 bg-gray-50 border-gray-200'; }
 
-  // --- 3. Badge Logic ---
-  const badges = useMemo(() => {
-    const b = ["🏅 용감한 도전자"]; // Always earned if completed
-    if (scores.vocab >= 27) b.push("📚 단어 마스터");
-    if (scores.structure === 20) b.push("🏗️ 문장 건축가");
-    if (scores.reading === 20) b.push("📖 독해 스나이퍼");
-    if (scores.grammar >= 27) b.push("⚡ 문법 헌터");
-    if (scores.total >= 95) b.push("👑 완벽주의자");
-    return b;
-  }, [scores]);
+  // AI State
+  const [aiAnalysis, setAiAnalysis] = useState<{diagnosis: string, weakness: string, prescription: string} | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // --- 4. Tag Analysis & Prescriptions ---
-  const analysis = useMemo(() => {
-    const wrongTags: Record<string, number> = {};
-    const wrongDifficulty: Record<number, number> = { 1: 0, 2: 0, 3: 0 };
-
-    records.forEach(r => {
-      if (!r.isCorrect) {
-        r.tags.forEach(t => {
-          wrongTags[t] = (wrongTags[t] || 0) + 1;
+  // --- AI Automatic Analysis ---
+  useEffect(() => {
+    const generateAnalysis = async () => {
+      if (!process.env.API_KEY) {
+        setAiAnalysis({
+          diagnosis: "API 키가 설정되지 않았습니다.",
+          weakness: "결과를 분석할 수 없습니다.",
+          prescription: "관리자에게 문의하세요."
         });
-        wrongDifficulty[r.difficulty] = (wrongDifficulty[r.difficulty] || 0) + 1;
+        setIsLoading(false);
+        return;
       }
-    });
 
-    // Priority Check
-    let priorityDiag = "";
-    let primaryAction = "";
+      // Filter wrong answers for the prompt
+      const wrongAnswers = records.filter(r => !r.isCorrect).map(r => 
+        `- [${r.category}] 문제: "${r.questionText}" / 학생답: ${r.selectedOption}`
+      ).join('\n');
 
-    if (scores.vocab < 15) {
-      priorityDiag = "어휘 응급";
-      primaryAction = "중등 필수 영단어장 1일 30개 암기";
-    } else if (scores.structure < 10) {
-      priorityDiag = "구조 붕괴";
-      primaryAction = "주어-동사 찾기 훈련 시급";
-    } else {
-      priorityDiag = "정밀 분석 필요";
-      primaryAction = "틀린 문제 유형별 오답노트 작성";
-    }
+      // Join weakness array for prompt
+      const weaknessStr = profile.weakness.join(', ');
 
-    // Weakness Match Logic
-    const categoryScores = {
-      '단어암기': scores.vocab / 30,
-      '문장만들기': scores.structure / 20,
-      '긴글읽기': scores.reading / 20,
-      '문법용어': scores.grammar / 30
-    };
-    
-    // Convert weakness string to English key for mapping
-    const mapWeaknessToCat = {
-      '단어암기': 'vocab',
-      '문장만들기': 'structure',
-      '긴글읽기': 'reading',
-      '문법용어': 'grammar'
-    };
+      const prompt = `
+        System: 당신은 대한민국 교육특구 '목동'에서 가장 유명한 중등 영어 입시 컨설턴트입니다. 
+        학부모님과 학생에게 보여줄 "프리미엄 진단 리포트"를 작성해야 합니다.
+        말투는 매우 전문적이고, 냉철하며, 신뢰감을 주어야 합니다. (반말 금지. 정중한 '해요'체 사용).
+        
+        Data:
+        - 학생: ${profile.name} (중2)
+        - 점수: ${finalScore}점 (목동 상위권 기준 ${finalScore >= 90 ? '합격점' : '재수강 필요'})
+        - 학생이 꼽은 약점: ${weaknessStr}
+        - 실제 틀린 문제들:
+        ${wrongAnswers}
 
-    // Find actual lowest
-    let lowestScore = 1.0;
-    let lowestArea = "";
-    Object.entries(categoryScores).forEach(([k, v]) => {
-      if (v < lowestScore) {
-        lowestScore = v;
-        lowestArea = k;
+        Output Format:
+        JSON 형식으로 다음 3가지 키를 포함하여 응답하세요. Markdown은 쓰지 마세요.
+        {
+          "diagnosis": "전체적인 총평. 학생의 현재 위치를 정확히 진단 (2-3문장)",
+          "weakness": "틀린 문제들을 분석하여 발견된 치명적인 약점과 원인 분석 (상세히)",
+          "prescription": "향후 3개월간의 구체적인 학습 로드맵 및 공부법 (3가지 포인트)"
+        }
+      `;
+
+      try {
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+        const response = await ai.models.generateContent({
+          model: 'gemini-3-flash-preview',
+          contents: prompt,
+          config: { responseMimeType: "application/json" }
+        });
+        
+        const text = response.text || "{}";
+        const json = JSON.parse(text);
+        setAiAnalysis(json);
+      } catch (e) {
+        console.error(e);
+        setAiAnalysis({
+          diagnosis: "AI 서버 통신 중 오류가 발생했습니다.",
+          weakness: "잠시 후 다시 시도해주세요.",
+          prescription: "기본 처방: 오답노트를 철저히 작성하세요."
+        });
+      } finally {
+        setIsLoading(false);
       }
-    });
-
-    const isPredictionCorrect = lowestArea === profile.weakness;
-    const diagnosisText = isPredictionCorrect
-      ? `네 예상이 맞았어. '${profile.weakness}' 부분이 진짜 구멍이야. 여기부터 메우자.`
-      : `아니야, 넌 사실 '${lowestArea}'가 더 문제였어. 메타인지 조정이 필요해.`;
-
-    // Prescriptions
-    const prescriptions = [];
-    if (wrongTags['voc_spelling'] > 2) prescriptions.push("단어 소리 내서 읽으면서 쓰기 (하루 10개씩!)");
-    if (wrongTags['voc_confusion'] > 0) prescriptions.push("헷갈리는 단어 표 만들어서 비교하기");
-    if (wrongTags['syn_svo'] > 0) prescriptions.push("교과서 본문에서 주어/동사 찾기 연습 (하루 3문장)");
-    if (wrongTags['grm_infinitive'] > 0) prescriptions.push("to부정사 3가지 용법 정리 & 예문 5개씩 만들기");
-    if (wrongTags['grm_passive'] > 0) prescriptions.push("'be + p.p.' 공식 암기하고 능동태↔수동태 바꾸기 연습");
-    if (wrongTags['grm_tense'] > 0) prescriptions.push("시제별 시간표현(yesterday, now, tomorrow) 정리하기");
-    
-    // Fallback prescription if clean
-    if (prescriptions.length === 0) prescriptions.push("틀린 문제가 별로 없네! 심화 독해 문제집에 도전해봐.");
-
-    return {
-      wrongDifficulty,
-      priorityDiag,
-      primaryAction,
-      diagnosisText,
-      prescriptions,
-      lowestArea
     };
-  }, [records, scores, profile]);
+
+    generateAnalysis();
+  }, [records, profile, finalScore]);
 
   // Chart Data
+  // Mock Data for "Mok-dong Top 10%" to simulate competition
   const chartData = [
-    { subject: '어휘', A: scores.vocab, fullMark: 30 },
-    { subject: '구조', A: scores.structure, fullMark: 20 },
-    { subject: '독해', A: scores.reading, fullMark: 20 },
-    { subject: '문법', A: scores.grammar, fullMark: 30 },
+    { subject: '어휘(Vocab)', MyScore: (scores.vocab / (records.filter(r => r.category === 'Vocabulary').length * 5 || 1)) * 100, Top10: 96 },
+    { subject: '구조(Structure)', MyScore: (scores.structure / (records.filter(r => r.category === 'Structure').length * 5 || 1)) * 100, Top10: 92 },
+    { subject: '독해(Reading)', MyScore: (scores.reading / (records.filter(r => r.category === 'Reading').length * 5 || 1)) * 100, Top10: 98 },
+    { subject: '문법(Grammar)', MyScore: (scores.grammar / (records.filter(r => r.category === 'Grammar').length * 5 || 1)) * 100, Top10: 95 },
   ];
 
-  // AI Doctor's Note State
-  const [aiOpinion, setAiOpinion] = React.useState<string | null>(null);
-  const [loadingAi, setLoadingAi] = React.useState(false);
-
-  const fetchAiOpinion = async () => {
-    if (!process.env.API_KEY) {
-      alert("API Key가 설정되지 않아 AI 소견을 불러올 수 없습니다. 기본 진단을 참고하세요.");
-      return;
-    }
-    setLoadingAi(true);
-    try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      // Use a strict prompt to ensure good output
-      const prompt = `
-        System: You are "Dr. English", a strict but warm middle school English tutor.
-        Task: Write a 2-sentence encouragement and specific advice based on this student's diagnostic result.
-        Student: ${profile.name} (${profile.grade})
-        Score: ${scores.total}/100
-        Weakest Area: ${analysis.lowestArea}
-        Diagnosis: ${analysis.diagnosisText}
-        Tone: Korean, warm but sharp. Use emojis.
-      `;
-      
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: prompt,
-      });
-      setAiOpinion(response.text);
-    } catch (e) {
-      console.error("AI Gen Error", e);
-      setAiOpinion("통신 상태가 좋지 않아 닥터의 정밀 소견을 가져오지 못했어. (하지만 위 진단결과는 정확해!)");
-    } finally {
-      setLoadingAi(false);
-    }
-  };
-
-  // Determine Basic vs Advanced Error for static note
-  const basicErrorCount = analysis.wrongDifficulty[1];
-  const staticOpinion = basicErrorCount > 0 
-    ? "기초 문제(난이도 1)를 틀린 건 뼈아파. 실수도 실력이야. 기초부터 다시 잡자." 
-    : "어려운 문제만 골라서 틀렸구나? 기본기는 튼튼하니 심화 학습만 보완하면 완벽해질 거야.";
-
   return (
-    <div className="max-w-2xl mx-auto bg-white shadow-2xl rounded-3xl overflow-hidden border border-gray-200">
-      <div className="bg-gray-800 text-white p-6 text-center">
-        <h1 className="text-2xl font-bold mb-2">🏥 닥터 잉글리시 진단서</h1>
-        <p className="opacity-80">환자: {profile.name} ({profile.grade})</p>
+    <div className="max-w-4xl mx-auto bg-gray-50 min-h-screen pb-12">
+      {/* Header Badge */}
+      <div className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
+        <div className="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
+          <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+            🏥 Dr. English <span className="text-xs bg-gray-800 text-white px-2 py-0.5 rounded">Premium</span>
+          </h1>
+          <button onClick={onRestart} className="text-sm text-gray-500 hover:text-gray-900 font-medium">
+            ✕ 닫기
+          </button>
+        </div>
       </div>
 
-      <div className="p-8 space-y-8">
-        {/* Total Score */}
-        <div className="text-center">
-          <div className="text-gray-500 font-medium mb-1">종합 점수</div>
-          <div className={`text-6xl font-black ${gradeColor}`}>{scores.total}<span className="text-2xl text-gray-400">/100</span></div>
-          <div className="mt-2 inline-block px-4 py-1 rounded-full bg-gray-100 font-bold text-gray-600">
-            등급: {grade}
+      <div className="p-6 space-y-6">
+        {/* 1. Score Card */}
+        <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 flex flex-col md:flex-row items-center gap-8">
+          <div className="text-center md:text-left flex-1">
+            <h2 className="text-gray-500 text-sm font-bold uppercase tracking-wider mb-2">Diagnostic Result</h2>
+            <div className="flex items-end justify-center md:justify-start gap-3">
+              <span className="text-6xl font-black text-gray-900">{finalScore}</span>
+              <span className="text-xl text-gray-400 font-medium mb-2">/ 100</span>
+            </div>
+            <div className={`mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border ${tierColor} font-bold text-sm`}>
+              <span>🏆 {tier} Class</span>
+            </div>
+            <p className="text-xs text-gray-400 mt-2">* 목동 학군 중2 기준 백분위 추정치입니다.</p>
+          </div>
+          
+          <div className="w-full md:w-1/2 h-48">
+             <ResponsiveContainer width="100%" height="100%">
+               <BarChart data={chartData} layout="vertical" barSize={12} margin={{ left: 40 }}>
+                 <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                 <XAxis type="number" domain={[0, 100]} hide />
+                 <YAxis dataKey="subject" type="category" width={80} tick={{fontSize: 11, fontWeight: 'bold'}} />
+                 <Tooltip cursor={{fill: 'transparent'}} contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)'}} />
+                 <Legend iconType="circle" />
+                 <Bar dataKey="MyScore" name="내 점수" fill="#3b82f6" radius={[0, 4, 4, 0]} />
+                 <Bar dataKey="Top10" name="목동 상위 10%" fill="#e5e7eb" radius={[0, 4, 4, 0]} />
+               </BarChart>
+             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Chart */}
-        <div className="h-64 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <RadarChart cx="50%" cy="50%" outerRadius="80%" data={chartData}>
-              <PolarGrid />
-              <PolarAngleAxis dataKey="subject" tick={{ fill: '#4b5563', fontSize: 12, fontWeight: 'bold' }} />
-              <PolarRadiusAxis angle={30} domain={[0, 'auto']} />
-              <Radar name="My Score" dataKey="A" stroke="#2563eb" fill="#3b82f6" fillOpacity={0.5} />
-            </RadarChart>
-          </ResponsiveContainer>
+        {/* 2. Radar Balance */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+           <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
+             <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
+               📊 영역별 밸런스
+             </h3>
+             <div className="h-64">
+               <ResponsiveContainer width="100%" height="100%">
+                 <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
+                   <PolarGrid />
+                   <PolarAngleAxis dataKey="subject" tick={{ fill: '#6b7280', fontSize: 11, fontWeight: 'bold' }} />
+                   <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} />
+                   <Radar name="My Score" dataKey="MyScore" stroke="#2563eb" fill="#3b82f6" fillOpacity={0.4} />
+                   <Legend />
+                 </RadarChart>
+               </ResponsiveContainer>
+             </div>
+           </div>
+
+           {/* 3. AI Diagnosis Card (Loading State Handled) */}
+           <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100 flex flex-col">
+             <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
+               🩺 닥터의 종합 소견
+             </h3>
+             {isLoading ? (
+               <div className="flex-1 flex flex-col items-center justify-center text-gray-400">
+                 <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-2"></div>
+                 <span className="text-xs">데이터 분석 중...</span>
+               </div>
+             ) : (
+               <div className="flex-1 bg-blue-50 rounded-xl p-5 text-sm leading-relaxed text-blue-900 flex flex-col justify-center">
+                 <p className="font-medium">"{aiAnalysis?.diagnosis}"</p>
+               </div>
+             )}
+           </div>
         </div>
 
-        {/* Breakdown */}
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div className="bg-green-50 p-3 rounded-lg">
-            <span className="font-bold block text-green-800">어휘력</span>
-            {scores.vocab}/30
+        {/* 4. Detailed Breakdown (Weakness & Prescription) */}
+        {!isLoading && aiAnalysis && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in-up">
+            {/* Weakness Analysis */}
+            <div className="bg-white rounded-2xl shadow-md p-0 overflow-hidden border border-gray-100">
+               <div className="bg-red-50 px-6 py-4 border-b border-red-100">
+                 <h3 className="text-red-800 font-bold flex items-center gap-2">
+                   ⚠️ 취약점 정밀 분석
+                 </h3>
+               </div>
+               <div className="p-6 text-gray-700 text-sm leading-7 whitespace-pre-wrap">
+                 {aiAnalysis.weakness}
+               </div>
+            </div>
+
+            {/* Prescription */}
+            <div className="bg-white rounded-2xl shadow-md p-0 overflow-hidden border border-gray-100">
+               <div className="bg-green-50 px-6 py-4 border-b border-green-100">
+                 <h3 className="text-green-800 font-bold flex items-center gap-2">
+                   💊 솔루션 & 처방전
+                 </h3>
+               </div>
+               <div className="p-6 text-gray-700 text-sm leading-7 whitespace-pre-wrap">
+                 {aiAnalysis.prescription}
+               </div>
+            </div>
           </div>
-          <div className="bg-purple-50 p-3 rounded-lg">
-            <span className="font-bold block text-purple-800">구조력</span>
-            {scores.structure}/20
-          </div>
-          <div className="bg-orange-50 p-3 rounded-lg">
-            <span className="font-bold block text-orange-800">독해력</span>
-            {scores.reading}/20
-          </div>
-          <div className="bg-pink-50 p-3 rounded-lg">
-            <span className="font-bold block text-pink-800">문법력</span>
-            {scores.grammar}/30
-          </div>
+        )}
+
+        {/* Footer Action */}
+        <div className="pt-6">
+          <button
+            onClick={onRestart}
+            className="w-full bg-gray-900 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-black transition active:scale-95 flex items-center justify-center gap-2"
+          >
+            🔄 다른 테스트 진행하기
+          </button>
         </div>
-
-        {/* Diagnosis */}
-        <div className="border-t border-gray-100 pt-6">
-          <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center">
-            🔍 자가진단 vs 실제 결과
-          </h3>
-          <p className="bg-gray-50 p-4 rounded-xl text-gray-700 italic border-l-4 border-gray-400">
-            "{analysis.diagnosisText}"
-          </p>
-        </div>
-
-        <div className="border-t border-gray-100 pt-6">
-          <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center">
-            👨‍⚕️ 닥터의 소견
-          </h3>
-          <div className="bg-blue-50 p-5 rounded-xl text-blue-900 leading-relaxed relative">
-             {/* Fallback Static Opinion */}
-            {!aiOpinion && (
-               <p>{staticOpinion}</p>
-            )}
-            {/* AI Opinion */}
-            {aiOpinion && (
-               <p className="animate-fade-in">{aiOpinion}</p>
-            )}
-
-            {/* AI Button - Only show if AI not yet loaded and API key conceptually exists */}
-            {!aiOpinion && !loadingAi && (
-               <button 
-                onClick={fetchAiOpinion}
-                className="mt-4 text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition flex items-center gap-1"
-               >
-                 ✨ AI 정밀 분석 더보기
-               </button>
-            )}
-             {loadingAi && <div className="mt-4 text-xs text-blue-500">닥터가 차트를 분석 중입니다...</div>}
-          </div>
-        </div>
-
-        <div className="border-t border-gray-100 pt-6">
-          <h3 className="text-lg font-bold text-gray-800 mb-3">💊 오늘의 처방전</h3>
-          <ul className="space-y-3">
-            <li className="flex items-start gap-3">
-              <span className="bg-red-100 text-red-600 font-bold px-2 py-1 rounded text-xs mt-0.5 shrink-0">최우선</span>
-              <span className="text-gray-700 font-medium">{analysis.primaryAction}</span>
-            </li>
-            {analysis.prescriptions.slice(0, 3).map((p, idx) => (
-              <li key={idx} className="flex items-start gap-3">
-                 <span className="bg-blue-100 text-blue-600 font-bold px-2 py-1 rounded text-xs mt-0.5 shrink-0">보완</span>
-                 <span className="text-gray-700">{p}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="border-t border-gray-100 pt-6 pb-6">
-          <h3 className="text-lg font-bold text-gray-800 mb-4">🏅 획득 뱃지</h3>
-          <div className="flex flex-wrap gap-2">
-            {badges.map(b => (
-              <span key={b} className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-bold border border-yellow-200 shadow-sm">
-                {b}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        <button
-          onClick={onRestart}
-          className="w-full bg-gray-900 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-black transition"
-        >
-          처음으로 돌아가기
-        </button>
       </div>
     </div>
   );

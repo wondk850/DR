@@ -1,12 +1,14 @@
 export type GradeLevel = '중1' | '중2' | '중3';
 export type ConfidenceLevel = '😫바닥' | '😕불안' | '😐보통' | '🙂괜찮음' | '😎자신만만';
 export type WeaknessType = '단어암기' | '문장만들기' | '긴글읽기' | '문법용어';
+export type TestMode = 'comprehensive' | 'grammar' | 'reading' | 'vocabulary';
 
 export interface UserProfile {
   name: string;
   grade: GradeLevel;
   confidence: ConfidenceLevel;
-  weakness: WeaknessType;
+  weakness: WeaknessType[]; // Changed to array for multi-select
+  mode: TestMode;
 }
 
 export interface Question {
@@ -30,10 +32,12 @@ export interface AnswerRecord {
   category: string;
   difficulty: number;
   tags: string[];
+  questionText: string;
 }
 
 export interface ScoreBoard {
   total: number;
+  maxTotal: number;
   vocab: number;
   structure: number;
   reading: number;
