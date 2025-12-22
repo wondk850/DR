@@ -9,13 +9,34 @@ interface Props {
   onRestart: () => void;
 }
 
+// Helper component to parse **bold** text and apply styles
+const HighlightedText: React.FC<{ text: string; colorClass?: string }> = ({ text, colorClass = "text-indigo-700 bg-indigo-50" }) => {
+  if (!text) return null;
+  // Split by **text** markers
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  
+  return (
+    <span className="leading-relaxed">
+      {parts.map((part, i) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+          // Remove asterisks and apply style
+          return (
+            <span key={i} className={`font-black mx-0.5 px-1.5 py-0.5 rounded ${colorClass}`}>
+              {part.slice(2, -2)}
+            </span>
+          );
+        }
+        return <span key={i}>{part}</span>;
+      })}
+    </span>
+  );
+};
+
 const ResultScreen: React.FC<Props> = ({ profile, records, onRestart }) => {
   // --- Scoring Logic ---
   const scores = useMemo(() => {
-    // Each question is worth 3.33 points roughly, or simplify to total points based on correct count
-    // But let's keep specific category buckets
     const board: ScoreBoard = { total: 0, maxTotal: records.length * 5, vocab: 0, structure: 0, reading: 0, grammar: 0 };
-    const pointsPerQuestion = 5; // Simplified points per question for internal calc
+    const pointsPerQuestion = 5;
 
     records.forEach(r => {
       if (r.isCorrect) {
@@ -30,7 +51,7 @@ const ResultScreen: React.FC<Props> = ({ profile, records, onRestart }) => {
   }, [records]);
 
   // Convert to 100-point scale for display
-  const finalScore = Math.round((scores.total / scores.maxTotal) * 100);
+  const finalScore = Math.round((scores.total / Math.max(scores.maxTotal, 1)) * 100);
   
   // Tier Calculation
   let tier = 'Bronze';
@@ -57,32 +78,39 @@ const ResultScreen: React.FC<Props> = ({ profile, records, onRestart }) => {
         return;
       }
 
-      // Filter wrong answers for the prompt
-      const wrongAnswers = records.filter(r => !r.isCorrect).map(r => 
-        `- [${r.category}] 문제: "${r.questionText}" / 학생답: ${r.selectedOption}`
-      ).join('\n');
+      // Collect Wrong Tags for Professional Analysis
+      const wrongTags = records
+        .filter(r => !r.isCorrect)
+        .flatMap(r => r.tags)
+        .filter((value, index, self) => self.indexOf(value) === index) // Unique tags
+        .join(', ');
 
-      // Join weakness array for prompt
-      const weaknessStr = profile.weakness.join(', ');
+      const wrongQuestionsSummary = records.filter(r => !r.isCorrect).map(r => 
+        `- [${r.category}] 문제유형: ${r.tags.join(', ')} / 오답: ${r.selectedOption}`
+      ).slice(0, 10).join('\n'); // Limit to 10 to fit context window
 
       const prompt = `
-        System: 당신은 대한민국 교육특구 '목동'에서 가장 유명한 중등 영어 입시 컨설턴트입니다. 
-        학부모님과 학생에게 보여줄 "프리미엄 진단 리포트"를 작성해야 합니다.
-        말투는 매우 전문적이고, 냉철하며, 신뢰감을 주어야 합니다. (반말 금지. 정중한 '해요'체 사용).
+        System: 당신은 대한민국 목동 학원가에서 가장 비싸고 유능한 '영어 입시 전문 컨설턴트'입니다.
+        학생과 학부모에게 보여줄 "프리미엄 정밀 진단 리포트"를 작성해야 합니다.
         
-        Data:
-        - 학생: ${profile.name} (중2)
-        - 점수: ${finalScore}점 (목동 상위권 기준 ${finalScore >= 90 ? '합격점' : '재수강 필요'})
-        - 학생이 꼽은 약점: ${weaknessStr}
-        - 실제 틀린 문제들:
-        ${wrongAnswers}
+        [필수 요청 사항]
+        1. **말투**: 매우 전문적이고, 냉철하며, 신뢰감을 주는 '해요'체를 사용하세요. (반말 금지)
+        2. **강조**: 중요한 키워드(취약한 문법 용어, 심각성, 핵심 전략 등)는 반드시 **이중 별표**로 감싸주세요. (예: **관계대명사**, **심각한 수준**, **암기 필수**) -> 프론트엔드에서 색상 처리를 할 것입니다.
+        3. **전문성**: 단순히 '열심히 하세요'가 아니라, 제공된 '태그(Tag)' 정보를 바탕으로 구체적인 문법 용어를 언급하세요.
+        
+        [Data]
+        - 학생 이름: ${profile.name} (학년: ${profile.grade})
+        - 선택 난이도: ${profile.level === 'beginner' ? '왕기초반' : profile.level === 'standard' ? '기본반' : '심화 실전반'}
+        - 점수: ${finalScore}점 (백분위 추정: 상위 ${100 - finalScore}%)
+        - 학생이 틀린 문제의 핵심 태그(약점): ${wrongTags}
+        - 오답 상세:
+        ${wrongQuestionsSummary}
 
-        Output Format:
-        JSON 형식으로 다음 3가지 키를 포함하여 응답하세요. Markdown은 쓰지 마세요.
+        [Output Format (JSON Only)]
         {
-          "diagnosis": "전체적인 총평. 학생의 현재 위치를 정확히 진단 (2-3문장)",
-          "weakness": "틀린 문제들을 분석하여 발견된 치명적인 약점과 원인 분석 (상세히)",
-          "prescription": "향후 3개월간의 구체적인 학습 로드맵 및 공부법 (3가지 포인트)"
+          "diagnosis": "총평. 현재 학생의 정확한 위치와 상태를 3문장 이내로 요약. 중요한 단어는 **강조**.",
+          "weakness": "취약점 심층 분석. 발견된 약점 태그들을 언급하며 왜 틀렸는지 논리적으로 설명. 불렛 포인트(-) 사용 가능. 중요한 문법 용어는 **강조**.",
+          "prescription": "향후 학습 로드맵. [1단계: 기초복구] -> [2단계: 개념정립] -> [3단계: 실전적용] 처럼 단계별로 구체적 교재나 학습법 제시. 중요한 행동은 **강조**."
         }
       `;
 
@@ -91,7 +119,10 @@ const ResultScreen: React.FC<Props> = ({ profile, records, onRestart }) => {
         const response = await ai.models.generateContent({
           model: 'gemini-3-flash-preview',
           contents: prompt,
-          config: { responseMimeType: "application/json" }
+          config: { 
+            responseMimeType: "application/json",
+            temperature: 0.7 
+          }
         });
         
         const text = response.text || "{}";
@@ -102,7 +133,7 @@ const ResultScreen: React.FC<Props> = ({ profile, records, onRestart }) => {
         setAiAnalysis({
           diagnosis: "AI 서버 통신 중 오류가 발생했습니다.",
           weakness: "잠시 후 다시 시도해주세요.",
-          prescription: "기본 처방: 오답노트를 철저히 작성하세요."
+          prescription: "기본 처방: **오답노트**를 철저히 작성하세요."
         });
       } finally {
         setIsLoading(false);
@@ -113,131 +144,137 @@ const ResultScreen: React.FC<Props> = ({ profile, records, onRestart }) => {
   }, [records, profile, finalScore]);
 
   // Chart Data
-  // Mock Data for "Mok-dong Top 10%" to simulate competition
   const chartData = [
-    { subject: '어휘(Vocab)', MyScore: (scores.vocab / (records.filter(r => r.category === 'Vocabulary').length * 5 || 1)) * 100, Top10: 96 },
-    { subject: '구조(Structure)', MyScore: (scores.structure / (records.filter(r => r.category === 'Structure').length * 5 || 1)) * 100, Top10: 92 },
-    { subject: '독해(Reading)', MyScore: (scores.reading / (records.filter(r => r.category === 'Reading').length * 5 || 1)) * 100, Top10: 98 },
-    { subject: '문법(Grammar)', MyScore: (scores.grammar / (records.filter(r => r.category === 'Grammar').length * 5 || 1)) * 100, Top10: 95 },
+    { subject: '어휘(Vocab)', MyScore: (scores.vocab / Math.max(records.filter(r => r.category === 'Vocabulary').length * 5, 1)) * 100, Top10: 96 },
+    { subject: '구조(Structure)', MyScore: (scores.structure / Math.max(records.filter(r => r.category === 'Structure').length * 5, 1)) * 100, Top10: 92 },
+    { subject: '독해(Reading)', MyScore: (scores.reading / Math.max(records.filter(r => r.category === 'Reading').length * 5, 1)) * 100, Top10: 98 },
+    { subject: '문법(Grammar)', MyScore: (scores.grammar / Math.max(records.filter(r => r.category === 'Grammar').length * 5, 1)) * 100, Top10: 95 },
   ];
 
   return (
-    <div className="max-w-4xl mx-auto bg-gray-50 min-h-screen pb-12">
+    <div className="max-w-4xl mx-auto bg-slate-50 min-h-screen pb-12 font-sans">
       {/* Header Badge */}
       <div className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
-          <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-            🏥 Dr. English <span className="text-xs bg-gray-800 text-white px-2 py-0.5 rounded">Premium</span>
+          <h1 className="text-xl font-extrabold text-slate-800 flex items-center gap-2 tracking-tight">
+            🏥 Dr. English <span className="text-xs bg-slate-800 text-white px-2 py-0.5 rounded shadow-sm">Premium Report</span>
           </h1>
-          <button onClick={onRestart} className="text-sm text-gray-500 hover:text-gray-900 font-medium">
+          <button onClick={onRestart} className="text-sm text-slate-500 hover:text-slate-900 font-medium transition">
             ✕ 닫기
           </button>
         </div>
       </div>
 
-      <div className="p-6 space-y-6">
-        {/* 1. Score Card */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 flex flex-col md:flex-row items-center gap-8">
-          <div className="text-center md:text-left flex-1">
-            <h2 className="text-gray-500 text-sm font-bold uppercase tracking-wider mb-2">Diagnostic Result</h2>
-            <div className="flex items-end justify-center md:justify-start gap-3">
-              <span className="text-6xl font-black text-gray-900">{finalScore}</span>
-              <span className="text-xl text-gray-400 font-medium mb-2">/ 100</span>
+      <div className="p-6 space-y-8">
+        {/* 1. Score Card Section */}
+        <section className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 flex flex-col md:flex-row items-center gap-10 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
+          
+          <div className="text-center md:text-left flex-1 z-10">
+            <h2 className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-3">Diagnostic Result</h2>
+            <div className="flex items-end justify-center md:justify-start gap-4">
+              <span className="text-7xl font-black text-slate-900 tracking-tighter">{finalScore}</span>
+              <span className="text-2xl text-slate-300 font-bold mb-3">/ 100</span>
             </div>
-            <div className={`mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border ${tierColor} font-bold text-sm`}>
+            <div className={`mt-5 inline-flex items-center gap-2 px-5 py-2 rounded-full border-2 ${tierColor} font-bold text-sm shadow-sm`}>
               <span>🏆 {tier} Class</span>
             </div>
-            <p className="text-xs text-gray-400 mt-2">* 목동 학군 중2 기준 백분위 추정치입니다.</p>
+            <p className="text-xs text-slate-400 mt-3 font-medium">* 목동 학군 {profile.grade} 기준 백분위 추정치</p>
           </div>
           
-          <div className="w-full md:w-1/2 h-48">
+          <div className="w-full md:w-1/2 h-56 z-10">
              <ResponsiveContainer width="100%" height="100%">
-               <BarChart data={chartData} layout="vertical" barSize={12} margin={{ left: 40 }}>
-                 <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+               <BarChart data={chartData} layout="vertical" barSize={16} margin={{ left: 40, right: 20 }}>
+                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
                  <XAxis type="number" domain={[0, 100]} hide />
-                 <YAxis dataKey="subject" type="category" width={80} tick={{fontSize: 11, fontWeight: 'bold'}} />
-                 <Tooltip cursor={{fill: 'transparent'}} contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)'}} />
-                 <Legend iconType="circle" />
-                 <Bar dataKey="MyScore" name="내 점수" fill="#3b82f6" radius={[0, 4, 4, 0]} />
-                 <Bar dataKey="Top10" name="목동 상위 10%" fill="#e5e7eb" radius={[0, 4, 4, 0]} />
+                 <YAxis dataKey="subject" type="category" width={80} tick={{fontSize: 11, fontWeight: 'bold', fill: '#64748b'}} />
+                 <Tooltip cursor={{fill: 'transparent'}} contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'}} />
+                 <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', fontWeight: '600' }} />
+                 <Bar dataKey="MyScore" name="내 점수" fill="#3b82f6" radius={[0, 6, 6, 0]} animationDuration={1500} />
+                 <Bar dataKey="Top10" name="목동 상위 10%" fill="#cbd5e1" radius={[0, 6, 6, 0]} />
                </BarChart>
              </ResponsiveContainer>
           </div>
-        </div>
+        </section>
 
-        {/* 2. Radar Balance */}
+        {/* 2. Radar & Diagnosis Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-           <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
-             <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
-               📊 영역별 밸런스
+           {/* Radar Chart */}
+           <div className="bg-white rounded-3xl shadow-lg p-6 border border-slate-100 flex flex-col">
+             <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2">
+               📊 영역별 정밀 밸런스
              </h3>
-             <div className="h-64">
+             <div className="flex-1 min-h-[250px]">
                <ResponsiveContainer width="100%" height="100%">
                  <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
-                   <PolarGrid />
-                   <PolarAngleAxis dataKey="subject" tick={{ fill: '#6b7280', fontSize: 11, fontWeight: 'bold' }} />
+                   <PolarGrid stroke="#e2e8f0" />
+                   <PolarAngleAxis dataKey="subject" tick={{ fill: '#475569', fontSize: 11, fontWeight: 'bold' }} />
                    <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} />
-                   <Radar name="My Score" dataKey="MyScore" stroke="#2563eb" fill="#3b82f6" fillOpacity={0.4} />
+                   <Radar name="My Score" dataKey="MyScore" stroke="#2563eb" strokeWidth={3} fill="#3b82f6" fillOpacity={0.2} />
                    <Legend />
                  </RadarChart>
                </ResponsiveContainer>
              </div>
            </div>
 
-           {/* 3. AI Diagnosis Card (Loading State Handled) */}
-           <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100 flex flex-col">
-             <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
-               🩺 닥터의 종합 소견
+           {/* AI Diagnosis */}
+           <div className="bg-white rounded-3xl shadow-lg p-6 border border-slate-100 flex flex-col">
+             <h3 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+               🩺 Dr. English 종합 소견
              </h3>
              {isLoading ? (
-               <div className="flex-1 flex flex-col items-center justify-center text-gray-400">
-                 <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-2"></div>
-                 <span className="text-xs">데이터 분석 중...</span>
+               <div className="flex-1 flex flex-col items-center justify-center text-slate-400 min-h-[200px]">
+                 <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+                 <span className="text-sm font-medium animate-pulse">AI가 정밀 분석 중입니다...</span>
                </div>
              ) : (
-               <div className="flex-1 bg-blue-50 rounded-xl p-5 text-sm leading-relaxed text-blue-900 flex flex-col justify-center">
-                 <p className="font-medium">"{aiAnalysis?.diagnosis}"</p>
+               <div className="flex-1 bg-slate-50 rounded-2xl p-6 text-slate-700 text-[15px] leading-7 shadow-inner flex flex-col justify-center border border-slate-100">
+                 <p>
+                   {aiAnalysis && <HighlightedText text={aiAnalysis.diagnosis} colorClass="text-blue-700 bg-blue-100" />}
+                 </p>
                </div>
              )}
            </div>
         </div>
 
-        {/* 4. Detailed Breakdown (Weakness & Prescription) */}
+        {/* 3. Detailed Analysis (Weakness & Prescription) */}
         {!isLoading && aiAnalysis && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in-up">
             {/* Weakness Analysis */}
-            <div className="bg-white rounded-2xl shadow-md p-0 overflow-hidden border border-gray-100">
-               <div className="bg-red-50 px-6 py-4 border-b border-red-100">
-                 <h3 className="text-red-800 font-bold flex items-center gap-2">
-                   ⚠️ 취약점 정밀 분석
+            <div className="bg-white rounded-3xl shadow-lg overflow-hidden border border-slate-100 group hover:shadow-xl transition-shadow duration-300">
+               <div className="bg-red-50 px-8 py-5 border-b border-red-100 flex items-center gap-3">
+                 <div className="bg-white p-2 rounded-full shadow-sm text-lg">⚠️</div>
+                 <h3 className="text-red-900 font-extrabold tracking-tight text-lg">
+                   취약점 정밀 분석
                  </h3>
                </div>
-               <div className="p-6 text-gray-700 text-sm leading-7 whitespace-pre-wrap">
-                 {aiAnalysis.weakness}
+               <div className="p-8 text-slate-700 text-[15px] leading-8 whitespace-pre-line">
+                 <HighlightedText text={aiAnalysis.weakness} colorClass="text-red-600 bg-red-50 border-b-2 border-red-100" />
                </div>
             </div>
 
             {/* Prescription */}
-            <div className="bg-white rounded-2xl shadow-md p-0 overflow-hidden border border-gray-100">
-               <div className="bg-green-50 px-6 py-4 border-b border-green-100">
-                 <h3 className="text-green-800 font-bold flex items-center gap-2">
-                   💊 솔루션 & 처방전
+            <div className="bg-white rounded-3xl shadow-lg overflow-hidden border border-slate-100 group hover:shadow-xl transition-shadow duration-300">
+               <div className="bg-emerald-50 px-8 py-5 border-b border-emerald-100 flex items-center gap-3">
+                 <div className="bg-white p-2 rounded-full shadow-sm text-lg">💊</div>
+                 <h3 className="text-emerald-900 font-extrabold tracking-tight text-lg">
+                   솔루션 & 학습 로드맵
                  </h3>
                </div>
-               <div className="p-6 text-gray-700 text-sm leading-7 whitespace-pre-wrap">
-                 {aiAnalysis.prescription}
+               <div className="p-8 text-slate-700 text-[15px] leading-8 whitespace-pre-line">
+                 <HighlightedText text={aiAnalysis.prescription} colorClass="text-emerald-700 bg-emerald-50 border-b-2 border-emerald-100" />
                </div>
             </div>
           </div>
         )}
 
         {/* Footer Action */}
-        <div className="pt-6">
+        <div className="pt-8 pb-4">
           <button
             onClick={onRestart}
-            className="w-full bg-gray-900 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-black transition active:scale-95 flex items-center justify-center gap-2"
+            className="w-full bg-slate-900 text-white font-bold py-5 rounded-2xl shadow-2xl hover:bg-black transition transform active:scale-[0.98] flex items-center justify-center gap-3 text-lg ring-4 ring-slate-100"
           >
-            🔄 다른 테스트 진행하기
+            <span>🔄 다른 테스트 진행하기</span>
           </button>
         </div>
       </div>

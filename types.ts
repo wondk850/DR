@@ -2,19 +2,21 @@ export type GradeLevel = '중1' | '중2' | '중3';
 export type ConfidenceLevel = '😫바닥' | '😕불안' | '😐보통' | '🙂괜찮음' | '😎자신만만';
 export type WeaknessType = '단어암기' | '문장만들기' | '긴글읽기' | '문법용어';
 export type TestMode = 'comprehensive' | 'grammar' | 'reading' | 'vocabulary';
+export type TargetLevel = 'beginner' | 'standard' | 'advanced'; // Added 'beginner'
 
 export interface UserProfile {
   name: string;
   grade: GradeLevel;
   confidence: ConfidenceLevel;
-  weakness: WeaknessType[]; // Changed to array for multi-select
+  weakness: WeaknessType[]; 
   mode: TestMode;
+  level: TargetLevel;
 }
 
 export interface Question {
   id: number;
   category: 'Vocabulary' | 'Structure' | 'Reading' | 'Grammar';
-  difficulty: 1 | 2 | 3;
+  difficulty: 0 | 1 | 2 | 3; // Added 0 for beginner questions
   question_text: string;
   options: string[];
   correct_answer: string;

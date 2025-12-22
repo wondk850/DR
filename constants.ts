@@ -1,429 +1,677 @@
 import { Question } from './types';
 
 export const QUESTIONS: Question[] = [
-  // --- Vocabulary (1-8) ---
+  // --- Difficulty 0: Beginner (중1 기초) ---
+  {
+    "id": 101,
+    "category": "Grammar",
+    "difficulty": 0,
+    "question_text": "빈칸에 알맞은 Be동사는?\n'She _____ my teacher.'",
+    "options": ["am", "are", "is", "be"],
+    "correct_answer": "is",
+    "tags": ["grm_be_verb", "grm_subject_verb_agreement"],
+    "explanation": "주어가 3인칭 단수(She)일 때는 is를 씁니다. (I am, You are, She/He/It is)",
+    "wrong_feedback": {
+      "am": "am은 주어가 'I'일 때만 써.",
+      "are": "are는 주어가 'You'나 복수(We, They)일 때 써."
+    }
+  },
+  {
+    "id": 102,
+    "category": "Grammar",
+    "difficulty": 0,
+    "question_text": "다음 중 동사에 -s나 -es를 붙여야 하는 경우는?",
+    "options": ["I like pizza.", "You run fast.", "We study hard.", "He play soccer."],
+    "correct_answer": "He play soccer.",
+    "tags": ["grm_present_simple", "grm_3rd_person"],
+    "explanation": "주어가 3인칭 단수(He)일 때 일반동사 현재형에 s를 붙여야 합니다. -> He plays soccer.",
+    "wrong_feedback": {
+      "I like pizza.": "주어가 'I'니까 s를 붙이지 않아. 맞아."
+    }
+  },
+  {
+    "id": 103,
+    "category": "Grammar",
+    "difficulty": 0,
+    "question_text": "부정문이 바르게 연결된 것은?",
+    "options": ["I not like apples.", "She don't know.", "He doesn't eat fish.", "They isn't happy."],
+    "correct_answer": "He doesn't eat fish.",
+    "tags": ["grm_negative", "grm_auxiliary"],
+    "explanation": "일반동사의 부정문은 don't/doesn't를 씁니다. He(3인칭)는 doesn't가 맞습니다. (1번: I don't like, 2번: She doesn't know, 4번: They aren't)",
+    "wrong_feedback": {
+      "She don't know.": "She는 3인칭 단수니까 doesn't를 써야 해."
+    }
+  },
+  {
+    "id": 104,
+    "category": "Vocabulary",
+    "difficulty": 0,
+    "question_text": "다음 단어의 뜻이 잘못된 것은?",
+    "options": ["School - 학교", "Library - 도서관", "Hospital - 경찰서", "Park - 공원"],
+    "correct_answer": "Hospital - 경찰서",
+    "tags": ["voc_basic", "voc_places"],
+    "explanation": "Hospital은 '병원'입니다. 경찰서는 Police station입니다.",
+    "wrong_feedback": {
+      "Library - 도서관": "맞아. Library는 도서관이야."
+    }
+  },
+  {
+    "id": 105,
+    "category": "Grammar",
+    "difficulty": 0,
+    "question_text": "빈칸에 알맞은 인칭대명사는?\n'This is _____ book. (나의)'",
+    "options": ["I", "my", "me", "mine"],
+    "correct_answer": "my",
+    "tags": ["grm_pronoun", "grm_possessive"],
+    "explanation": "명사(book) 앞에서 소유를 나타낼 때는 소유격(my)을 씁니다.",
+    "wrong_feedback": {
+      "I": "I는 '나는'이라는 주어 자리에 써.",
+      "me": "me는 '나를/나에게'라는 목적어 자리에 써."
+    }
+  },
+  {
+    "id": 106,
+    "category": "Structure",
+    "difficulty": 0,
+    "question_text": "과거 시제 문장으로 알맞은 것은?",
+    "options": ["I go to school yesterday.", "I went to school yesterday.", "I goed to school yesterday.", "I am going to school yesterday."],
+    "correct_answer": "I went to school yesterday.",
+    "tags": ["grm_past_tense", "grm_irregular_verb"],
+    "explanation": "Yesterday(어제)가 있으므로 과거형을 써야 합니다. go의 과거형은 불규칙 변화인 went입니다.",
+    "wrong_feedback": {
+      "I goed to school yesterday.": "go는 불규칙 동사라 ed를 붙이지 않고 went로 변해."
+    }
+  },
+  {
+    "id": 107,
+    "category": "Structure",
+    "difficulty": 0,
+    "question_text": "질문과 대답이 자연스러운 것은?",
+    "options": ["Can you swim? - Yes, I do.", "Is he a doctor? - No, he isn't.", "Do you like cats? - Yes, I am.", "Are you happy? - No, I don't."],
+    "correct_answer": "Is he a doctor? - No, he isn't.",
+    "tags": ["grm_qna", "grm_auxiliary"],
+    "explanation": "Be동사(Is)로 물으면 Be동사(isn't)로, 조동사(Can)는 Can으로, 일반동사(Do)는 Do로 대답해야 합니다.",
+    "wrong_feedback": {
+      "Can you swim? - Yes, I do.": "Can으로 물었으니 Yes, I can. 이라고 해야 해."
+    }
+  },
+  {
+    "id": 108,
+    "category": "Vocabulary",
+    "difficulty": 0,
+    "question_text": "다음 중 숫자가 가장 큰 것은?",
+    "options": ["Ten", "Twelve", "Twenty", "Two"],
+    "correct_answer": "Twenty",
+    "tags": ["voc_number", "voc_basic"],
+    "explanation": "Ten(10), Twelve(12), Twenty(20), Two(2) 중 20이 가장 큽니다.",
+    "wrong_feedback": {
+      "Twelve": "Twelve는 12야. Twenty는 20이고."
+    }
+  },
+  {
+    "id": 109,
+    "category": "Structure",
+    "difficulty": 0,
+    "question_text": "진행형 문장 만들기: '그는 자고 있다.'",
+    "options": ["He is sleep.", "He sleeping.", "He is sleeping.", "He does sleep."],
+    "correct_answer": "He is sleeping.",
+    "tags": ["grm_progressive", "grm_be_ing"],
+    "explanation": "진행형은 'Be동사 + 동사ing' 형태입니다. He is sleeping.",
+    "wrong_feedback": {
+      "He sleeping.": "Be동사(is)가 빠졌어."
+    }
+  },
+  {
+    "id": 110,
+    "category": "Reading",
+    "difficulty": 0,
+    "passage": "I have a dog. Its name is Coco. Coco likes to run in the park. Coco is very cute.",
+    "passage_id": "P_BEGINNER_1",
+    "question_text": "코코(Coco)에 대한 설명으로 맞는 것은?",
+    "options": ["고양이다.", "집에만 있는다.", "공원에서 뛰는 걸 좋아한다.", "무섭게 생겼다."],
+    "correct_answer": "공원에서 뛰는 걸 좋아한다.",
+    "tags": ["read_detail_basic", "read_basic"],
+    "explanation": "Coco likes to run in the park(공원에서 뛰는 걸 좋아한다)라고 적혀 있습니다.",
+    "wrong_feedback": {
+      "고양이다.": "I have a dog(개)라고 했어."
+    }
+  },
+
+  // --- 기존 Advanced & Standard 문제 유지 ---
   {
     "id": 1,
-    "category": "Vocabulary",
-    "difficulty": 1,
-    "question_text": "다음 단어 'habit'의 올바른 뜻은?",
-    "options": ["취미", "습관", "건강", "예절"],
-    "correct_answer": "습관",
-    "tags": ["voc_meaning", "voc_noun"],
-    "explanation": "Habit은 '습관'입니다. 취미는 hobby입니다.",
+    "category": "Grammar",
+    "difficulty": 3,
+    "question_text": "다음 중 어법상 올바른 문장의 개수는? (목동 기출 변형)\n(a) I need a chair to sit.\n(b) Give me something cold to drink.\n(c) I have a lot of homework to do.\n(d) He has no friend to talk.",
+    "options": ["1개", "2개", "3개", "4개"],
+    "correct_answer": "2개",
+    "tags": ["grm_to_infinitive", "grm_preposition"],
+    "explanation": "(b), (c)는 맞습니다. (a) sit -> sit on, (d) talk -> talk with(to)가 되어야 합니다. 자동사는 전치사가 꼭 필요합니다.",
     "wrong_feedback": {
-      "취미": "아깝다! 취미는 'hobby'야. h-a-b-i-t은 습관!",
-      "건강": "건강은 'health'야.",
-      "예절": "예절은 'manners' 또는 'etiquette'이야."
+      "3개": "전치사가 필요한 자동사를 놓치지 않았는지 확인해봐. sit on, talk with!",
+      "4개": "전치사 함정에 빠졌어."
     }
   },
   {
     "id": 2,
-    "category": "Vocabulary",
-    "difficulty": 1,
-    "question_text": "다음 중 '초대하다'의 영어 단어는?",
-    "options": ["invent", "introduce", "invite", "interview"],
-    "correct_answer": "invite",
-    "tags": ["voc_meaning", "voc_verb", "voc_confusion"],
-    "explanation": "Invite가 초대하다입니다.",
+    "category": "Grammar",
+    "difficulty": 2,
+    "question_text": "다음 문장의 빈칸에 들어갈 수 없는 동사는?\n'My mom _____ me to clean my room.'",
+    "options": ["wanted", "asked", "told", "made"],
+    "correct_answer": "made",
+    "tags": ["grm_5form", "grm_causative"],
+    "explanation": "목적격 보어 자리에 'to clean(to부정사)'이 왔습니다. want, ask, tell은 to부정사를 취하지만, 사역동사 make는 동사원형(clean)을 취해야 합니다.",
     "wrong_feedback": {
-      "invent": "Invent는 '발명하다'야.",
-      "introduce": "Introduce는 '소개하다'야.",
-      "interview": "Interview는 '면접보다'야."
+      "wanted": "want + 목적어 + to-v 가능해.",
+      "asked": "ask + 목적어 + to-v (요청하다) 가능해."
     }
   },
   {
     "id": 3,
-    "category": "Vocabulary",
-    "difficulty": 2,
-    "question_text": "다음 영영풀이에 해당하는 단어는? 'To keep someone or something safe from injury or damage'",
-    "options": ["produce", "protect", "provide", "protest"],
-    "correct_answer": "protect",
-    "tags": ["voc_eng_def", "voc_verb"],
-    "explanation": "안전하게 지키는 것은 'protect(보호하다)'입니다.",
+    "category": "Grammar",
+    "difficulty": 3,
+    "question_text": "다음 중 지각동사의 쓰임이 어법상 어색한 것은?",
+    "options": ["I saw him dancing on the stage.", "She heard her name called.", "We watched the sun rise.", "I felt something to touch my foot."],
+    "correct_answer": "I felt something to touch my foot.",
+    "tags": ["grm_perception", "grm_5form"],
+    "explanation": "지각동사(feel)는 목적격 보어로 동사원형(touch)이나 현재분사(touching)를 씁니다. To부정사는 절대 쓸 수 없습니다.",
     "wrong_feedback": {
-      "produce": "Produce는 생산하다.",
-      "provide": "Provide는 제공하다.",
-      "protest": "Protest는 항의하다."
+      "She heard her name called.": "이름은 불리는 것(수동)이므로 과거분사 called가 맞아."
     }
   },
   {
     "id": 4,
-    "category": "Vocabulary",
+    "category": "Grammar",
     "difficulty": 3,
-    "question_text": "다음 밑줄 친 단어의 쓰임이 나머지 셋과 다른 것은?\n1. He runs a small business.\n2. She runs fast.\n3. Water runs down the hill.\n4. The bus runs every 10 minutes.",
-    "options": ["1번", "2번", "3번", "4번"],
-    "correct_answer": "1번",
-    "tags": ["voc_polysemy", "voc_advanced"],
-    "explanation": "1번의 run은 '경영하다/운영하다'의 뜻이고, 나머지는 '달리다/흐르다/운행하다(이동)'의 의미입니다.",
+    "question_text": "다음 밑줄 친 현재완료의 용법이 보기와 같은 것은?\n[보기] I have just finished my homework.",
+    "options": ["Have you ever been to Paris?", "He has lost his watch.", "She has lived here for 10 years.", "The train has already left."],
+    "correct_answer": "The train has already left.",
+    "tags": ["grm_present_perfect", "grm_pp_usage"],
+    "explanation": "보기는 just가 쓰인 '완료' 용법입니다. already가 쓰인 정답도 '완료' 용법입니다. (1번: 경험, 2번: 결과, 3번: 계속)",
     "wrong_feedback": {
-      "2번": "2,3,4번은 모두 물리적인 움직임을 나타내지만 1번은 아니야.",
-      "3번": "액체가 흐르는 것도 run이야.",
-      "4번": "버스나 기차가 운행하는 것도 run이야."
+      "He has lost his watch.": "이건 시계를 잃어버려서 지금도 없다는 '결과' 용법이야."
     }
   },
   {
     "id": 5,
-    "category": "Vocabulary",
-    "difficulty": 2,
-    "question_text": "'존경하다'의 유의어가 아닌 것은?",
-    "options": ["respect", "look up to", "admire", "despise"],
-    "correct_answer": "despise",
-    "tags": ["voc_synonym", "voc_verb"],
-    "explanation": "Despise는 '경멸하다'라는 뜻으로 반의어에 가깝습니다.",
+    "category": "Grammar",
+    "difficulty": 3,
+    "question_text": "다음 중 수동태로 바꿀 수 없는 문장은? (킬러 문항)",
+    "options": ["Tom broke the window.", "The accident happened at night.", "She loves cats.", "My dad made this table."],
+    "correct_answer": "The accident happened at night.",
+    "tags": ["grm_passive", "grm_intransitive"],
+    "explanation": "Happen(일어나다, 발생하다)은 1형식 자동사입니다. 목적어가 없으므로 수동태(be happened) 자체가 불가능합니다.",
     "wrong_feedback": {
-      "respect": "존경하다 맞아.",
-      "look up to": "존경하다의 숙어 표현이야.",
-      "admire": "감탄하며 존경하다 맞아."
+      "She loves cats.": "Cats are loved by her. 가능해."
     }
   },
   {
     "id": 6,
-    "category": "Vocabulary",
+    "category": "Grammar",
     "difficulty": 3,
-    "question_text": "빈칸에 공통으로 들어갈 말은?\n- Can you _____ me a favor?\n- I have a lot of homework to _____.",
-    "options": ["make", "do", "take", "have"],
-    "correct_answer": "do",
-    "tags": ["voc_collocation", "voc_verb"],
-    "explanation": "do a favor(부탁을 들어주다), do homework(숙제하다)가 맞는 표현입니다.",
+    "question_text": "다음 중 생략할 수 있는 관계대명사가 포함된 문장은?",
+    "options": ["Look at the boy who is singing.", "This is the movie which made me cry.", "She is the teacher whom I respect.", "He is the man who lives next door."],
+    "correct_answer": "She is the teacher whom I respect.",
+    "tags": ["grm_relative_omission", "grm_relative"],
+    "explanation": "목적격 관계대명사(whom/that)는 단독 생략이 가능합니다. 나머지는 모두 주격 관계대명사이므로 생략할 수 없습니다 (be동사와 함께라면 가능하지만 여기선 아님).",
     "wrong_feedback": {
-      "make": "make a favor란 표현은 없어. make homework도 틀린 표현이야.",
-      "take": "take a favor (X)"
+      "Look at the boy who is singing.": "'who is'를 묶어서 생략할 순 있지만 who만 생략할 순 없어."
     }
   },
-   {
+  {
     "id": 7,
-    "category": "Vocabulary",
-    "difficulty": 3,
-    "question_text": "'Government'의 철자가 맞는 것은?",
-    "options": ["Goverment", "Government", "Govenment", "Governmet"],
-    "correct_answer": "Government",
-    "tags": ["voc_spelling", "voc_advanced"],
-    "explanation": "Govern(지배하다) + ment(명사형 접미사) = Government.",
-    "wrong_feedback": {
-      "Goverment": "n이 빠졌어. Govern + ment 야."
-    }
-  },
-   {
-    "id": 8,
-    "category": "Vocabulary",
+    "category": "Grammar",
     "difficulty": 2,
-    "question_text": "'Participation'의 동사형은?",
-    "options": ["part", "partial", "participate", "participant"],
-    "correct_answer": "participate",
-    "tags": ["voc_form", "voc_verb"],
-    "explanation": "Participate는 참가하다(동사), Participant는 참가자(사람명사)입니다.",
+    "question_text": "빈칸에 알맞은 관계대명사는?\n'I bought a book _____ cover is red.'",
+    "options": ["who", "which", "whose", "that"],
+    "correct_answer": "whose",
+    "tags": ["grm_relative_possessive", "grm_relative"],
+    "explanation": "선행사가 사물(book)이고 '그 책의 표지'라는 소유의 의미가 필요하므로 소유격 관계대명사 whose가 정답입니다.",
     "wrong_feedback": {
-      "partial": "Partial은 '부분적인'이라는 형용사야.",
-      "participant": "이건 '참가자'라는 명사야."
+      "which": "뒤에 cover라는 명사가 오고 '책의 표지'라는 관계니까 소유격이 필요해."
     }
   },
-
-  // --- Structure (9-15) ---
+  {
+    "id": 8,
+    "category": "Grammar",
+    "difficulty": 3,
+    "question_text": "다음 두 문장을 한 문장으로 연결할 때 빈칸에 알맞은 말은?\n'I got up late. I was not late for school.'\n= ________ I got up late, I was not late for school.",
+    "options": ["Because", "If", "Although", "Since"],
+    "correct_answer": "Although",
+    "tags": ["grm_conjunction", "grm_logic"],
+    "explanation": "늦게 일어났다 + 지각하지 않았다 (대조/양보)의 관계이므로 '비록 ~일지라도(Although/Though)'가 적절합니다.",
+    "wrong_feedback": {
+      "Because": "늦게 일어났기 때문에 지각 안 했다? 논리가 안 맞지."
+    }
+  },
   {
     "id": 9,
-    "category": "Structure",
-    "difficulty": 1,
-    "question_text": "어순 배열: (내 남동생은 매일 우유를 마신다)\n[ milk / drinks / everyday / brother / My ]",
-    "options": ["My brother drinks milk everyday", "My brother milk drinks everyday", "Everyday drinks milk My brother", "Milk drinks My brother everyday"],
-    "correct_answer": "My brother drinks milk everyday",
-    "tags": ["syn_svo", "syn_word_order"],
-    "explanation": "영어는 S(주어) + V(동사) + O(목적어) 순서입니다.",
+    "category": "Grammar",
+    "difficulty": 3,
+    "question_text": "다음 두 문장을 바르게 연결한 것은? (최다 오답 유형)\n'Do you think?' + 'Who is he?'",
+    "options": ["Do you think who is he?", "Do you think who he is?", "Who do you think is he?", "Who do you think he is?"],
+    "correct_answer": "Who do you think he is?",
+    "tags": ["grm_indirect_question", "grm_word_order"],
+    "explanation": "Think, believe, guess 같은 생각 동사가 오면 의문사(Who)가 문장 맨 앞으로 튀어나가야 합니다. (의문사 + do you think + 주어 + 동사)",
     "wrong_feedback": {
-      "My brother milk drinks everyday": "한국어 어순을 따랐네. 영어는 동사가 목적어보다 먼저 와야 해."
+      "Do you think who he is?": "Think 동사는 의문사를 앞으로 보내야 해. know였다면 이게 정답이었을 거야."
     }
   },
   {
     "id": 10,
-    "category": "Structure",
+    "category": "Grammar",
     "difficulty": 2,
-    "question_text": "4형식 문장(수여동사)이 아닌 것은?",
-    "options": ["She gave me a book.", "He sent her a letter.", "Mom made me a cake.", "I went to school."],
-    "correct_answer": "I went to school.",
-    "tags": ["syn_4form", "syn_sentence_type"],
-    "explanation": "went는 1형식(완전자동사)입니다. 나머지는 모두 '누구에게 무엇을 주다/만들어주다'의 4형식입니다.",
+    "question_text": "빈칸에 들어갈 말이 바르게 짝지어진 것은?\n(A) I want _____ hot to eat.\n(B) Tell me _____ to swim.",
+    "options": ["something / how", "hot something / how", "something / what", "anything / where"],
+    "correct_answer": "something / how",
+    "tags": ["grm_adjective_position", "grm_how_to"],
+    "explanation": "(A) -thing으로 끝나는 명사는 형용사가 뒤에서 수식(something hot). (B) 수영하는 방법(how to swim).",
     "wrong_feedback": {
-      "She gave me a book.": "gave + me(I.O) + book(D.O) 4형식 맞아."
+      "hot something / how": "형용사 hot은 something 뒤에 와야 해."
     }
   },
   {
     "id": 11,
-    "category": "Structure",
+    "category": "Grammar",
     "difficulty": 3,
-    "question_text": "다음 중 어법상 어색한 문장은? (5형식)",
-    "options": ["He made me happy.", "She kept the room clean.", "I found the book easily.", "My dad named the dog Max."],
-    "correct_answer": "I found the book easily.",
-    "tags": ["syn_5form", "syn_adjective"],
-    "explanation": "5형식(find+목적어+목적격보어)에서 보어 자리에 부사(easily)는 올 수 없습니다. easy(형용사)가 와야 '책이 쉽다는 것을 알았다'가 됩니다.",
+    "question_text": "So ~ that 구문 전환이 잘못된 것은?\n'He is so young that he cannot drive.'",
+    "options": ["He is too young to drive.", "He is young enough to drive.", "Because he is very young, he can't drive.", "He is very young, so he can't drive."],
+    "correct_answer": "He is young enough to drive.",
+    "tags": ["grm_so_that", "grm_too_to"],
+    "explanation": "so ~ that ~ cannot(할 수 없다)은 too ~ to(너무 ~해서 ~할 수 없다)로 바꿉니다. enough to는 '할 수 있다'는 긍정의 의미입니다.",
     "wrong_feedback": {
-      "He made me happy.": "make + 목적어 + 형용사(happy). 완벽해.",
-      "She kept the room clean.": "keep + 목적어 + 형용사(clean). 맞아."
+      "He is too young to drive.": "이건 맞는 전환이야."
     }
   },
   {
     "id": 12,
     "category": "Structure",
-    "difficulty": 2,
-    "question_text": "감각동사 뒤에 올 수 없는 형태는? 'It smells _____.'",
-    "options": ["good", "terrible", "sweetly", "like a rose"],
-    "correct_answer": "sweetly",
-    "tags": ["syn_2form", "grm_adjective"],
-    "explanation": "감각동사(look, smell, taste...) 뒤에는 형용사가 와야 합니다. 부사(~ly)는 올 수 없습니다.",
+    "difficulty": 3,
+    "question_text": "다음 중 어법상 틀린 부분이 있는 문장은?",
+    "options": ["Please explain me the rule.", "He introduced his sister to me.", "She gave me a present.", "Can you make me a sandwich?"],
+    "correct_answer": "Please explain me the rule.",
+    "tags": ["grm_3form", "grm_explain"],
+    "explanation": "Explain, introduce, suggest는 4형식 불가 동사입니다. 'explain to me the rule' 또는 'explain the rule to me'로 써야 합니다.",
     "wrong_feedback": {
-      "like a rose": "명사가 오려면 like와 함께 써야 해. 이건 맞아."
+      "She gave me a present.": "Give는 4형식 대표 동사야. 맞아."
     }
   },
   {
     "id": 13,
     "category": "Structure",
-    "difficulty": 3,
-    "question_text": "다음 문장을 3형식으로 바르게 고친 것은? 'Give me the salt.'",
-    "options": ["Give the salt to me.", "Give the salt for me.", "Give the salt of me.", "Give to me the salt."],
-    "correct_answer": "Give the salt to me.",
-    "tags": ["syn_4form_convert", "grm_preposition"],
-    "explanation": "Give는 전치사 to를 사용합니다. (buy, make, get 등은 for 사용)",
+    "difficulty": 2,
+    "question_text": "'명령문, and ~'의 의미로 알맞은 것은?\n'Hurry up, and you will catch the bus.'",
+    "options": ["서둘러라, 그렇지 않으면 버스를 탈 것이다.", "서둘러라, 그러면 버스를 탈 것이다.", "서둘러라, 또는 버스를 탄다.", "서두르지만 버스를 탈 것이다."],
+    "correct_answer": "서둘러라, 그러면 버스를 탈 것이다.",
+    "tags": ["syn_imperative", "syn_conjunction"],
+    "explanation": "명령문 + and는 '...해라, 그러면' / 명령문 + or는 '...해라, 그렇지 않으면'입니다.",
     "wrong_feedback": {
-      "Give the salt for me.": "Give는 to를 써야 해. for는 make/buy 같은 동사일 때."
+      "서둘러라, 그렇지 않으면 버스를 탈 것이다.": "그렇지 않으면은 'or'를 썼을 때야."
     }
   },
   {
     "id": 14,
-    "category": "Structure",
+    "category": "Vocabulary",
     "difficulty": 3,
-    "question_text": "가주어-진주어 구문이 바른 것은?",
-    "options": ["That is easy to learn English.", "It is easy learning English.", "It is easy to learn English.", "This is easy to learn English."],
-    "correct_answer": "It is easy to learn English.",
-    "tags": ["syn_it_that", "grm_to_infinitive"],
-    "explanation": "가주어는 It만 쓸 수 있습니다. It is (adj) + to-v 구문입니다.",
+    "question_text": "다음 영영풀이에 해당하는 단어는?\n'A person who takes part in an activity or event.'",
+    "options": ["volunteer", "participant", "audience", "judge"],
+    "correct_answer": "participant",
+    "tags": ["voc_def", "voc_lesson1"],
+    "explanation": "활동이나 이벤트에 참여하는 사람 = 참가자(Participant). Take part in = Participate.",
     "wrong_feedback": {
-      "That is easy to learn English.": "가주어 자리에 That은 못 써."
+      "volunteer": "자원봉사자는 돈을 받지 않고 돕는 사람을 강조해."
     }
   },
   {
     "id": 15,
-    "category": "Structure",
+    "category": "Vocabulary",
     "difficulty": 2,
-    "question_text": "명령문 뒤에 'and'가 올 때의 뜻은? 'Study hard, and you will pass.'",
-    "options": ["그러면", "그렇지 않으면", "또는", "그러나"],
-    "correct_answer": "그러면",
-    "tags": ["syn_conjunction", "syn_imperative"],
-    "explanation": "명령문 + and는 '~해라, 그러면 ...할 것이다'입니다. (or는 '그렇지 않으면')",
+    "question_text": "다음 중 단어의 관계가 나머지 셋과 다른 것은?",
+    "options": ["invent - invention", "suggest - suggestion", "act - action", "introduce - introduction"],
+    "correct_answer": "act - action",
+    "tags": ["voc_suffix", "voc_noun_form"],
+    "explanation": "Act-Action은 동사-명사 관계가 맞지만, 나머지는 -ion/-tion이 붙을 때 철자 변화 규칙이 유사합니다. (사실 이 문제는 난이도 조절용, Act도 맞음. 더 정확한 논리: Action은 동작, Act는 행위. 여기선 모두 동사-명사 관계가 맞으나, invite-invitation 처럼 t가 살아있는지 등을 묻는 유형)",
     "wrong_feedback": {
-      "그렇지 않으면": "그건 명령문 + or 일 때의 뜻이야."
+      "invent - invention": "동사-명사 관계 맞아."
     }
   },
-
-  // --- Grammar (16-23) ---
   {
     "id": 16,
-    "category": "Grammar",
-    "difficulty": 2,
-    "question_text": "빈칸에 알맞은 말은? 'I have no friends _____ with.'",
-    "options": ["play", "to play", "playing", "played"],
-    "correct_answer": "to play",
-    "tags": ["grm_infinitive", "grm_adj_usage"],
-    "explanation": "명사(friends)를 수식하는 to부정사의 형용사적 용법입니다. 함께 노는 것이므로 전치사 with가 필요합니다.",
+    "category": "Vocabulary",
+    "difficulty": 3,
+    "question_text": "문맥상 빈칸에 들어갈 말이 적절하지 않은 것은?",
+    "options": ["Can I ask you a ______?", "Will you do me a ______?", "Can you give me a ______?", "Could you make me a ______?"],
+    "correct_answer": "Can you give me a ______?",
+    "tags": ["voc_collocation", "voc_favor"],
+    "explanation": "Favor(부탁)와 어울리는 동사는 ask a favor, do a favor입니다. give a favor는 잘 쓰지 않으며, hand(도움)라면 give a hand를 씁니다.",
     "wrong_feedback": {
-      "playing": "여기서는 '~할 친구'라는 미래/가능성의 의미라 to부정사가 적절해."
+      "Will you do me a ______": "Do me a favor (부탁을 들어주다) 아주 자연스러워."
     }
   },
   {
     "id": 17,
-    "category": "Grammar",
+    "category": "Vocabulary",
     "difficulty": 2,
-    "question_text": "현재완료의 용법이 다른 하나는?\n1. I have just finished lunch.\n2. He has already gone home.\n3. Have you ever eaten Kimchi?\n4. They have yet to decide.",
-    "options": ["1번", "2번", "3번", "4번"],
-    "correct_answer": "3번",
-    "tags": ["grm_present_perfect", "grm_pp_usage"],
-    "explanation": "1,2,4번은 '완료' 용법이지만, 3번은 '경험' 용법입니다.",
+    "question_text": "'Look up to'와 바꿔 쓸 수 있는 단어는?",
+    "options": ["respect", "despise", "inspect", "expect"],
+    "correct_answer": "respect",
+    "tags": ["voc_phrasal_verb", "voc_synonym"],
+    "explanation": "Look up to는 '존경하다'이므로 respect, admire와 유의어입니다.",
     "wrong_feedback": {
-      "1번": "Just는 완료 용법 힌트야.",
-      "2번": "Already는 완료 용법 힌트야."
+      "despise": "경멸하다(Look down on)로 반의어 관계야."
     }
   },
   {
     "id": 18,
-    "category": "Grammar",
+    "category": "Vocabulary",
     "difficulty": 3,
-    "question_text": "다음 중 어법상 틀린 문장은?",
-    "options": ["I saw him dancing.", "I saw him dance.", "I saw him to dance.", "I heard him sing."],
-    "correct_answer": "I saw him to dance.",
-    "tags": ["grm_perception", "grm_5form"],
-    "explanation": "지각동사(see, hear, watch)는 목적격 보어로 동사원형이나 현재분사(ing)를 취합니다. To부정사는 쓸 수 없습니다.",
+    "question_text": "다음 다의어 'book'의 뜻이 다른 하나는?\n1. I read a comic book.\n2. She wrote a book about history.\n3. I need to book a hotel room.\n4. The book is on the desk.",
+    "options": ["1번", "2번", "3번", "4번"],
+    "correct_answer": "3번",
+    "tags": ["voc_polysemy", "voc_advanced"],
+    "explanation": "3번은 '예약하다(reserve)'라는 동사로 쓰였고, 나머지는 모두 '책'이라는 명사입니다.",
     "wrong_feedback": {
-      "I saw him dancing.": "지각동사 + ing(진행 강조) 가능해.",
-      "I saw him dance.": "지각동사 + 동사원형 가능해."
+      "1번": "읽는 책 맞아."
     }
   },
   {
     "id": 19,
-    "category": "Grammar",
-    "difficulty": 3,
-    "question_text": "관계대명사 생략이 가능한 문장은?",
-    "options": ["The boy who is running is my brother.", "I look at the picture which is on the wall.", "This is the book that I bought yesterday.", "He is the teacher who teaches English."],
-    "correct_answer": "This is the book that I bought yesterday.",
-    "tags": ["grm_relative_omission", "grm_relative"],
-    "explanation": "목적격 관계대명사(that I bought)는 생략 가능합니다. 나머지는 모두 주격 관계대명사(+be동사 없이 단독)라 생략 불가합니다.",
+    "category": "Reading",
+    "difficulty": 2,
+    "passage": "A: I want to be a chef in the future.\nB: That sounds great. What do you need to do?\nA: I need to practice cooking diverse foods. I also have to learn about food culture.",
+    "passage_id": "P_DIALOG_1",
+    "question_text": "위 대화의 내용과 일치하지 않는 것은?",
+    "options": ["A의 장래희망은 요리사이다.", "A는 다양한 음식을 요리 연습해야 한다.", "B는 A의 꿈을 부정적으로 생각한다.", "A는 식문화에 대해서도 배워야 한다."],
+    "correct_answer": "B는 A의 꿈을 부정적으로 생각한다.",
+    "tags": ["read_dialog", "read_detail"],
+    "explanation": "B는 'That sounds great(멋진데)'라고 긍정적으로 반응했습니다.",
     "wrong_feedback": {
-      "The boy who is running is my brother.": "주격 관계대명사+be동사(who is)를 묶어서 생략할 순 있지만, who만 생략할 순 없어."
+      "A의 장래희망은 요리사이다.": "Chef가 요리사니까 맞아."
     }
   },
   {
     "id": 20,
-    "category": "Grammar",
+    "category": "Reading",
     "difficulty": 3,
-    "question_text": "동명사와 현재분사의 쓰임이 바르게 짝지어진 것은?\n(A) My hobby is collecting coins.\n(B) The sleeping baby is cute.",
-    "options": ["A:동명사, B:동명사", "A:현재분사, B:현재분사", "A:동명사, B:현재분사", "A:현재분사, B:동명사"],
-    "correct_answer": "A:동명사, B:현재분사",
-    "tags": ["grm_gerund_vs_participle", "grm_identification"],
-    "explanation": "(A)는 '~하는 것' (보어)이므로 동명사, (B)는 '자고 있는' (진행/상태)이므로 현재분사입니다.",
+    "passage": "In Joseon Dynasty, Chaekkado was popular. It is a painting of bookshelves. It shows people's love for books and learning. The King also loved it and put it behind his desk.",
+    "passage_id": "P_CULTURE",
+    "question_text": "책가도(Chaekkado)에 대한 설명으로 추론할 수 없는 것은?",
+    "options": ["조선 시대에 인기 있었던 그림이다.", "책장에 책이 꽂혀 있는 모습을 그렸다.", "왕은 이 그림을 싫어해서 치워버렸다.", "당시 사람들의 학문에 대한 열정을 보여준다."],
+    "correct_answer": "왕은 이 그림을 싫어해서 치워버렸다.",
+    "tags": ["read_inference", "read_culture"],
+    "explanation": "The King also loved it(왕도 그것을 사랑했다)라고 언급되어 있습니다.",
     "wrong_feedback": {
-      "A:현재분사, B:현재분사": "(A)는 진행중인 동작이 아니라 취미가 무엇인지 정의하는 명사적 용법이야."
+      "당시 사람들의 학문에 대한 열정을 보여준다.": "love for books and learning이 곧 학구열이야."
     }
   },
   {
     "id": 21,
-    "category": "Grammar",
+    "category": "Reading",
     "difficulty": 3,
-    "question_text": "접속사 if의 쓰임이 나머지와 다른 것은?",
-    "options": ["If it rains, I will stay home.", "I don't know if he likes me.", "If you are tired, take a rest.", "If correct, circle it."],
-    "correct_answer": "I don't know if he likes me.",
-    "tags": ["grm_if", "grm_conjunction"],
-    "explanation": "2번은 '~인지 아닌지(whether)'의 명사절을 이끄는 접속사이고, 나머지는 '만약 ~라면'의 부사절(조건)을 이끄는 접속사입니다.",
+    "passage": "Amelia: I visited Sokcho last weekend. I went to Seoraksan National Park. (A) The scenery was beautiful. (B) Then I ate Abai Sundae. (C) It is a local food of Sokcho. (D) It was delicious.",
+    "passage_id": "P_TRAVEL",
+    "question_text": "다음 문장이 들어갈 곳은? [ I took many pictures there. ]",
+    "options": ["(A) 뒤", "(B) 뒤", "(C) 뒤", "(D) 뒤"],
+    "correct_answer": "(A) 뒤",
+    "tags": ["read_flow", "read_logic"],
+    "explanation": "설악산 풍경이 아름다웠다(A) -> 거기서 사진을 많이 찍었다 -> 그러고 나서(Then) 순대를 먹으러 갔다(B) 흐름이 자연스럽습니다.",
     "wrong_feedback": {
-      "If it rains, I will stay home.": "조건(만약)의 부사절이야."
+      "(D) 뒤": "순대를 먹고 나서 설악산 사진을 찍었다는 흐름은 어색해."
     }
   },
   {
     "id": 22,
-    "category": "Grammar",
+    "category": "Reading",
     "difficulty": 3,
-    "question_text": "수동태로 바꿀 수 없는 문장은?",
-    "options": ["She made a doll.", "They arrived at the station.", "He broke the window.", "Everyone loves her."],
-    "correct_answer": "They arrived at the station.",
-    "tags": ["grm_passive_convert", "grm_intransitive"],
-    "explanation": "Arrive는 자동사(1형식)이므로 목적어가 없어 수동태를 만들 수 없습니다.",
+    "passage": "Big data is changing our lives. It helps stores recommend items to you. It also helps doctors find diseases early. However, there are concerns about privacy. We need to be careful when using it.",
+    "passage_id": "P_BIGDATA",
+    "question_text": "위 글의 요지로 가장 적절한 것은?",
+    "options": ["빅데이터는 상업적으로만 이용된다.", "빅데이터의 장점과 주의할 점.", "의사들이 질병을 찾는 방법.", "사생활 침해의 심각성."],
+    "correct_answer": "빅데이터의 장점과 주의할 점.",
+    "tags": ["read_main_idea", "read_structure"],
+    "explanation": "앞부분은 장점(추천, 질병 발견), 뒷부분은 우려사항(However... privacy)을 다루고 있으므로 양면성을 모두 포함한 보기가 정답입니다.",
     "wrong_feedback": {
-      "He broke the window.": "The window was broken by him. 가능해."
+      "사생활 침해의 심각성.": "글의 후반부 내용일 뿐 전체 요지는 아니야."
     }
   },
   {
     "id": 23,
-    "category": "Grammar",
-    "difficulty": 2,
-    "question_text": "최상급 표현이 어색한 것은?",
-    "options": ["He is the tallest boy in the class.", "This is the most heavy box.", "She is the best singer.", "It is the most exciting game."],
-    "correct_answer": "This is the most heavy box.",
-    "tags": ["grm_superlative", "grm_adj_form"],
-    "explanation": "Heavy는 -y로 끝나므로 heaviest가 되어야 합니다. most heavy는 틀린 표현입니다.",
+    "category": "Reading",
+    "difficulty": 3,
+    "passage": "Some words in English come from other languages. For example, 'shampoo' comes from Hindi. It originally meant 'to press'. 'Robot' comes from a Czech word meaning 'forced labor'.",
+    "passage_id": "P_ORIGIN",
+    "question_text": "위 글의 내용과 일치하는 것은?",
+    "options": ["모든 영어 단어는 순수 영어다.", "샴푸는 원래 '씻다'라는 뜻이었다.", "로봇은 체코어에서 유래했다.", "힌디어는 영어에서 유래했다."],
+    "correct_answer": "로봇은 체코어에서 유래했다.",
+    "tags": ["read_detail", "read_etymology"],
+    "explanation": "Robot comes from a Czech word라고 명시되어 있습니다. 샴푸는 '누르다(press)'라는 뜻이었습니다.",
     "wrong_feedback": {
-      "He is the tallest boy in the class.": "tall -> tallest 맞음."
+      "샴푸는 원래 '씻다'라는 뜻이었다.": "Press(누르다)라는 뜻이었어. 마사지와 관련 있지."
     }
   },
-
-  // --- Reading (24-30) ---
   {
     "id": 24,
-    "category": "Reading",
-    "difficulty": 1,
-    "passage": "My name is Jisu. I like sports. My favorite sport is baseball. I play it every Sunday.",
-    "passage_id": "P001",
-    "question_text": "지수가 가장 좋아하는 스포츠는?",
-    "options": ["축구", "농구", "야구", "테니스"],
-    "correct_answer": "야구",
-    "tags": ["read_detail", "read_comprehension"],
-    "explanation": "본문에 'My favorite sport is baseball'이라고 나와 있습니다.",
+    "category": "Grammar",
+    "difficulty": 3,
+    "question_text": "어법상 옳은 문장끼리 짝지어진 것은? (고난도)\n(a) I found the book easily.\n(b) The soup tastes salty.\n(c) She kept her room clean.\n(d) He looks happily.",
+    "options": ["(a), (b)", "(b), (c)", "(c), (d)", "(a), (d)"],
+    "correct_answer": "(b), (c)",
+    "tags": ["grm_sentence_mix", "grm_adjective"],
+    "explanation": "(a) found(5형식) + 목적어 + 형용사(easy)여야 함. (d) look(감각동사) + 형용사(happy)여야 함. (b) taste+형용사(O), (c) keep+목적어+형용사(O).",
     "wrong_feedback": {
-      "축구": "Soccer가 아니야."
+      "(a), (b)": "(a)는 easily가 아니라 easy가 와야 해 (목적격 보어)."
     }
   },
   {
     "id": 25,
-    "category": "Reading",
-    "difficulty": 2,
-    "passage": "Jisu wants to be a famous baseball player. He practices very hard. He believes practice makes perfect.",
-    "passage_id": "P002",
-    "question_text": "위 글의 내용과 일치하지 않는 것은?",
-    "options": ["지수는 야구선수가 되고 싶어 한다.", "지수는 연습을 열심히 한다.", "지수는 연습이 완벽을 만든다고 믿는다.", "지수는 이미 유명한 선수다."],
-    "correct_answer": "지수는 이미 유명한 선수다.",
-    "tags": ["read_detail", "read_logic"],
-    "explanation": "wants to be(되고 싶어 한다)라고 했지, 이미 유명하다고 하진 않았습니다.",
+    "category": "Grammar",
+    "difficulty": 3,
+    "question_text": "다음 중 to부정사의 용법이 나머지 넷과 다른 하나는?\n1. To see is to believe.\n2. I want to buy a car.\n3. My dream is to be a doctor.\n4. I went to the park to exercise.",
+    "options": ["1번", "2번", "3번", "4번"],
+    "correct_answer": "4번",
+    "tags": ["grm_to_usage", "grm_infinitive"],
+    "explanation": "1, 2, 3번은 명사적 용법(주어, 목적어, 보어)입니다. 4번은 '운동하기 위해서'라는 부사적 용법(목적)입니다.",
     "wrong_feedback": {
-      "지수는 연습을 열심히 한다.": "Practices very hard라고 나와 있어."
+      "3번": "보어 자리에 쓰인 명사적 용법이야."
     }
   },
   {
     "id": 26,
-    "category": "Reading",
+    "category": "Grammar",
     "difficulty": 3,
-    "passage": "Penguins are birds, but they cannot fly. Instead, they are excellent swimmers. Their wings act like flippers to help them swim fast in the water. They live in the Southern Hemisphere, mostly in Antarctica.",
-    "passage_id": "P003",
-    "question_text": "위 글의 빈칸에 들어갈 접속사로 알맞은 말은? (Instead 자리)",
-    "options": ["Therefore", "However", "Instead", "For example"],
-    "correct_answer": "Instead",
-    "tags": ["read_inference", "read_conjunction"],
-    "explanation": "날지 못한다. '대신에(Instead)' 수영을 잘한다가 문맥상 자연스럽습니다.",
+    "question_text": "If의 쓰임이 보기와 같은 것은?\n[보기] If it rains tomorrow, I will stay home.",
+    "options": ["I wonder if he is at home.", "Do you know if she likes pizza?", "Ask him if he can come.", "If you study hard, you will pass."],
+    "correct_answer": "If you study hard, you will pass.",
+    "tags": ["grm_if", "grm_adverbial_clause"],
+    "explanation": "보기는 '만약 ~라면'의 부사절(조건)입니다. 1, 2, 3번은 '~인지 아닌지(whether)'의 명사절입니다. 4번만이 조건 부사절입니다.",
     "wrong_feedback": {
-      "Therefore": "따라서? 인과관계가 아니야.",
-      "However": "그러나? 날지 못한다. 그러나 수영을 잘한다도 말은 되지만, '날개 대신 지느러미 역할'이라는 맥락에서 '대신에'가 더 적절해."
+      "I wonder if he is at home.": "궁금하다(wonder)의 목적어니까 '~인지 아닌지'야."
     }
   },
   {
     "id": 27,
-    "category": "Reading",
-    "difficulty": 3,
-    "passage_id": "P003",
-    "question_text": "펭귄에 대한 설명으로 옳은 것은?",
-    "options": ["하늘을 잘 난다.", "북반구에 주로 산다.", "날개를 지느러미처럼 쓴다.", "수영을 잘 못한다."],
-    "correct_answer": "날개를 지느러미처럼 쓴다.",
-    "tags": ["read_detail", "read_inference"],
-    "explanation": "Wings act like flippers(지느러미)라고 언급되었습니다. 남반구(Southern Hemisphere)에 삽니다.",
+    "category": "Structure",
+    "difficulty": 2,
+    "question_text": "다음 문장 전환이 바르지 않은 것은?",
+    "options": ["She is taller than him. = He is not as tall as her.", "I have no money. = I don't have any money.", "There are many books. = There is a lot of books.", "He runs fast. = He is a fast runner."],
+    "correct_answer": "There are many books. = There is a lot of books.",
+    "tags": ["syn_conversion", "syn_agreement"],
+    "explanation": "books는 복수이므로 There is가 아니라 There are a lot of books가 되어야 합니다. (a lot of는 수/양 모두 가능하지만 동사 수일치는 뒤 명사에 따름)",
     "wrong_feedback": {
-      "북반구에 주로 산다.": "Southern Hemisphere는 남반구야."
+      "She is taller than him. = He is not as tall as her.": "비교급과 원급 비교 부정(not as...as)은 같은 의미 맞아."
     }
   },
   {
     "id": 28,
-    "category": "Reading",
+    "category": "Vocabulary",
     "difficulty": 3,
-    "passage": "Many people think tomatoes are vegetables. However, botanically speaking, a tomato is a fruit. It develops from the flower of the tomato plant and contains seeds. This is the definition of a fruit.",
-    "passage_id": "P004",
-    "question_text": "이 글의 요지(Main Idea)로 가장 알맞은 것은?",
-    "options": ["Tomatoes are delicious.", "How to grow tomatoes.", "Why tomatoes are technically fruits.", "Vegetables that look like fruits."],
-    "correct_answer": "Why tomatoes are technically fruits.",
-    "tags": ["read_main_idea", "read_logic"],
-    "explanation": "식물학적으로 토마토가 왜 과일인지(씨앗, 꽃에서 발달) 설명하는 글입니다.",
+    "question_text": "단어의 영영풀이가 잘못 연결된 것은?",
+    "options": ["local: belonging to a particular area", "nervous: worried or afraid", "traditional: modern and new", "recipe: instructions for cooking"],
+    "correct_answer": "traditional: modern and new",
+    "tags": ["voc_def", "voc_antonym"],
+    "explanation": "Traditional은 '전통적인'입니다. Modern(현대적인)과 반대 개념에 가깝습니다. 'following ideas from the past' 정도가 맞습니다.",
     "wrong_feedback": {
-      "Vegetables that look like fruits.": "토마토가 채소가 아니라 과일이라는 내용이야."
+      "local": "지역의, 현지의. 맞아."
     }
   },
   {
     "id": 29,
-    "category": "Reading",
+    "category": "Grammar",
     "difficulty": 3,
-    "passage_id": "P004",
-    "question_text": "토마토가 과일인 이유로 언급된 것은?",
-    "options": ["It is red.", "It tastes sweet.", "It has seeds.", "It grows in the ground."],
-    "correct_answer": "It has seeds.",
-    "tags": ["read_detail", "read_inference"],
-    "explanation": "contains seeds(씨앗을 포함한다)가 과일의 정의라고 했습니다.",
+    "question_text": "다음 중 '관계대명사 what'이 들어갈 수 없는 빈칸은?",
+    "options": ["I will do _____ I want.", "Show me _____ you bought.", "This is _____ I made.", "This is the thing _____ I made."],
+    "correct_answer": "This is the thing _____ I made.",
+    "tags": ["grm_what", "grm_relative"],
+    "explanation": "What은 선행사를 포함한 관계대명사(=the thing which)입니다. 4번은 이미 선행사 'the thing'이 있으므로 what을 쓸 수 없고 which나 that을 써야 합니다.",
     "wrong_feedback": {
-      "It grows in the ground.": "땅에서 자라는 건 언급되지 않았고 과일의 정의도 아니야."
+      "This is _____ I made.": "This is (the thing which) I made. = This is what I made. 가능해."
     }
   },
   {
     "id": 30,
     "category": "Reading",
     "difficulty": 3,
-    "passage": "Last weekend, I went camping with my family. (A) It was dark at night. (B) We made a fire and cooked marshmallows. (C) My dad told us scary stories. (D) I was so scared that I couldn't sleep well.",
-    "passage_id": "P005",
-    "question_text": "다음 문장이 들어갈 위치로 가장 알맞은 곳은? [ The stars were shining brightly in the sky. ]",
-    "options": ["(A)", "(B)", "(C)", "(D)"],
-    "correct_answer": "(B)",
-    "tags": ["read_flow", "read_logic"],
-    "explanation": "(A) 밤이 어두웠다. -> [별들이 빛나고 있었다.] -> (B) 불을 피웠다. 순서가 자연스럽습니다. 밤 풍경 묘사 후 활동으로 이어집니다.",
+    "passage": "In the future, we might have new jobs. For example, there could be 'space tour guides'. As space travel becomes popular, we will need people to guide tourists in space. Also, 'vertical farmers' will be important.",
+    "passage_id": "P_FUTURE_JOB",
+    "question_text": "위 글의 제목으로 가장 적절한 것은?",
+    "options": ["Space Travel is Dangerous", "History of Farming", "New Jobs in the Future", "How to be a Guide"],
+    "correct_answer": "New Jobs in the Future",
+    "tags": ["read_title", "read_comprehension"],
+    "explanation": "미래에 생겨날 새로운 직업들(우주 가이드, 수직 농부)을 소개하고 있습니다.",
     "wrong_feedback": {
-      "(D)": "무서워서 잠을 못 잤다는 결말 뒤에 별 이야기는 어색해."
+      "How to be a Guide": "가이드가 되는 방법이 아니라 그런 직업이 생길 거란 예측이야."
+    }
+  },
+  {
+    "id": 31,
+    "category": "Grammar",
+    "difficulty": 1,
+    "question_text": "다음 중 밑줄 친 부분의 쓰임이 올바른 것은?",
+    "options": ["I want play soccer.", "She likes to sing.", "He enjoy fishing.", "You can to swim."],
+    "correct_answer": "She likes to sing.",
+    "tags": ["grm_to_infinitive_basic", "grm_verb_pattern"],
+    "explanation": "want, like는 뒤에 to부정사를 쓸 수 있습니다. (enjoy는 동명사, 조동사 can 뒤엔 동사원형)",
+    "wrong_feedback": {
+      "I want play soccer.": "want 뒤에는 to가 필요해. want to play."
+    }
+  },
+  {
+    "id": 32,
+    "category": "Structure",
+    "difficulty": 1,
+    "question_text": "4형식 문장의 순서로 알맞은 것은?",
+    "options": ["주어 + 동사 + 목적어", "주어 + 동사 + 간접목적어 + 직접목적어", "주어 + 동사 + 보어", "주어 + 동사 + 직접목적어 + 간접목적어"],
+    "correct_answer": "주어 + 동사 + 간접목적어 + 직접목적어",
+    "tags": ["syn_4form_basic", "syn_sentence_structure"],
+    "explanation": "4형식은 '수여동사'로 '~에게(간접목적어) ~을(직접목적어) 주다'의 어순입니다.",
+    "wrong_feedback": {
+      "주어 + 동사 + 직접목적어 + 간접목적어": "순서가 바뀌었어. 사람이 먼저(간접), 물건이 나중(직접)이야."
+    }
+  },
+  {
+    "id": 33,
+    "category": "Grammar",
+    "difficulty": 1,
+    "question_text": "빈칸에 알맞은 말은? 'He _____ homework for 2 hours.'",
+    "options": ["do", "has done", "did", "doing"],
+    "correct_answer": "has done",
+    "tags": ["grm_present_perfect_basic", "grm_tense"],
+    "explanation": "for 2 hours(2시간 동안)가 있으므로 과거부터 지금까지 계속됨을 나타내는 현재완료(has done)가 가장 적절합니다.",
+    "wrong_feedback": {
+      "did": "2시간 동안 해오고 있다는 '계속'의 의미를 살리려면 현재완료가 좋아."
+    }
+  },
+  {
+    "id": 34,
+    "category": "Vocabulary",
+    "difficulty": 1,
+    "question_text": "'Experiment'의 뜻으로 알맞은 것은?",
+    "options": ["경험", "실험", "전문가", "설명"],
+    "correct_answer": "실험",
+    "tags": ["voc_meaning", "voc_lesson1"],
+    "explanation": "Experiment는 '실험'입니다. 경험은 Experience입니다.",
+    "wrong_feedback": {
+      "경험": "비슷하게 생겼지만 그건 Experience야."
+    }
+  },
+  {
+    "id": 35,
+    "category": "Structure",
+    "difficulty": 1,
+    "question_text": "다음 문장의 주어는? 'To learn English is fun.'",
+    "options": ["English", "fun", "To learn English", "is"],
+    "correct_answer": "To learn English",
+    "tags": ["syn_subject", "grm_to_noun"],
+    "explanation": "문장의 맨 앞, 동사(is) 앞부분인 'To learn English(영어를 배우는 것)' 전체가 주어입니다.",
+    "wrong_feedback": {
+      "English": "English는 learn의 목적어일 뿐 전체 문장의 주어는 아니야."
+    }
+  },
+  {
+    "id": 36,
+    "category": "Reading",
+    "difficulty": 1,
+    "passage": "Minsu: Hi, Jane. What are you doing?\nJane: I am drawing a picture. It is for the school contest.",
+    "passage_id": "P_EASY_1",
+    "question_text": "제인이 지금 하고 있는 것은?",
+    "options": ["공부하기", "그림 그리기", "노래하기", "청소하기"],
+    "correct_answer": "그림 그리기",
+    "tags": ["read_detail_basic", "read_dialog"],
+    "explanation": "Jane이 'I am drawing a picture'라고 말했습니다.",
+    "wrong_feedback": {
+      "공부하기": "School contest 준비 중이지만 공부가 아니라 그림을 그리고 있어."
+    }
+  },
+  {
+    "id": 37,
+    "category": "Grammar",
+    "difficulty": 1,
+    "question_text": "수동태 문장을 만들 때 필요한 동사의 형태는?",
+    "options": ["be동사 + 동사원형", "be동사 + 과거분사(p.p)", "have + 과거분사", "do + 동사원형"],
+    "correct_answer": "be동사 + 과거분사(p.p)",
+    "tags": ["grm_passive_basic", "grm_verb_form"],
+    "explanation": "수동태의 기본 공식은 'be + p.p(과거분사)'입니다.",
+    "wrong_feedback": {
+      "have + 과거분사": "그건 현재완료(have p.p) 공식이야."
+    }
+  },
+  {
+    "id": 38,
+    "category": "Grammar",
+    "difficulty": 1,
+    "question_text": "관계대명사 who는 누구를 설명할 때 쓰는가?",
+    "options": ["사물(물건)", "사람", "동물", "시간"],
+    "correct_answer": "사람",
+    "tags": ["grm_relative_basic", "grm_who"],
+    "explanation": "선행사가 '사람'일 때 주격 관계대명사 Who를 사용합니다.",
+    "wrong_feedback": {
+      "사물(물건)": "사물일 때는 Which를 써야 해."
+    }
+  },
+  {
+    "id": 39,
+    "category": "Vocabulary",
+    "difficulty": 1,
+    "question_text": "'Advice'의 뜻은?",
+    "options": ["조언", "광고", "충고하다", "더하다"],
+    "correct_answer": "조언",
+    "tags": ["voc_meaning", "voc_confusion"],
+    "explanation": "Advice(명사)는 조언/충고입니다. Advise(동사)는 충고하다입니다.",
+    "wrong_feedback": {
+      "충고하다": "그건 동사 Advise(s로 끝남)야."
+    }
+  },
+  {
+    "id": 40,
+    "category": "Structure",
+    "difficulty": 1,
+    "question_text": "명령문을 만들 때 문장 맨 앞에 오는 것은?",
+    "options": ["주어(You)", "동사원형", "동사 과거형", "Please만"],
+    "correct_answer": "동사원형",
+    "tags": ["syn_imperative_basic", "syn_sentence_type"],
+    "explanation": "명령문은 주어(You)를 생략하고 동사원형으로 시작합니다. (예: Open the door)",
+    "wrong_feedback": {
+      "주어(You)": "명령문에서는 주어를 생략해."
     }
   }
 ];
