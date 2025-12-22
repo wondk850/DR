@@ -9,9 +9,10 @@ interface Props {
   onPrev: () => void;
   onExit: () => void;
   userName: string;
+  isRetryMode?: boolean; // New prop
 }
 
-const QuizScreen: React.FC<Props> = ({ questions, currentQuestionIndex, onAnswer, onNext, onPrev, onExit, userName }) => {
+const QuizScreen: React.FC<Props> = ({ questions, currentQuestionIndex, onAnswer, onNext, onPrev, onExit, userName, isRetryMode }) => {
   const question = questions[currentQuestionIndex];
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
@@ -46,7 +47,7 @@ const QuizScreen: React.FC<Props> = ({ questions, currentQuestionIndex, onAnswer
       setFeedback(`❌ ${specificFeedback}`);
     }
 
-    // Record answer with full context for AI analysis later
+    // Record answer
     onAnswer({
       questionId: question.id,
       isCorrect: correct,
@@ -62,6 +63,13 @@ const QuizScreen: React.FC<Props> = ({ questions, currentQuestionIndex, onAnswer
 
   return (
     <div className="w-full max-w-lg mx-auto px-4 relative">
+      {/* Retry Mode Banner */}
+      {isRetryMode && (
+          <div className="bg-red-500 text-white text-center py-2 px-4 rounded-xl mb-4 font-bold shadow-md animate-pulse">
+              💊 오답 집중 치료 모드 작동 중!
+          </div>
+      )}
+
       {/* Navigation Header */}
       <div className="flex justify-between items-center mb-6">
         <button 
@@ -89,7 +97,7 @@ const QuizScreen: React.FC<Props> = ({ questions, currentQuestionIndex, onAnswer
         </div>
         <div className="h-3 bg-gray-200 rounded-full w-full overflow-hidden shadow-inner">
           <div 
-            className="h-full bg-gradient-to-r from-blue-400 to-blue-600 transition-all duration-500 ease-out" 
+            className={`h-full transition-all duration-500 ease-out ${isRetryMode ? 'bg-red-500' : 'bg-gradient-to-r from-blue-400 to-blue-600'}`}
             style={{ width: `${progressPercent}%` }}
           />
         </div>
@@ -111,8 +119,8 @@ const QuizScreen: React.FC<Props> = ({ questions, currentQuestionIndex, onAnswer
       )}
 
       {/* Question Card */}
-      <div className="bg-white p-6 md:p-8 rounded-3xl shadow-xl mb-6 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-2 h-full bg-blue-500"></div>
+      <div className={`bg-white p-6 md:p-8 rounded-3xl shadow-xl mb-6 relative overflow-hidden ${isRetryMode ? 'border-2 border-red-100' : ''}`}>
+        <div className={`absolute top-0 left-0 w-2 h-full ${isRetryMode ? 'bg-red-500' : 'bg-blue-500'}`}></div>
         
         <div className="flex items-center gap-2 mb-4">
           <span className={`text-xs px-2 py-1 rounded-md font-bold uppercase tracking-wide ${
@@ -186,7 +194,7 @@ const QuizScreen: React.FC<Props> = ({ questions, currentQuestionIndex, onAnswer
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur-md border-t border-gray-200 flex justify-center z-50 animate-slide-up">
           <button
             onClick={onNext}
-            className="w-full max-w-lg bg-gray-900 hover:bg-black text-white font-bold py-4 px-8 rounded-2xl shadow-xl transform transition active:scale-95 flex items-center justify-center gap-3 text-lg"
+            className={`w-full max-w-lg text-white font-bold py-4 px-8 rounded-2xl shadow-xl transform transition active:scale-95 flex items-center justify-center gap-3 text-lg ${isRetryMode ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-900 hover:bg-black'}`}
           >
             다음 문제 
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
