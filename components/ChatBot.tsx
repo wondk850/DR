@@ -105,7 +105,7 @@ const ChatBot: React.FC<Props> = ({ profile, records }) => {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none">
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none print:hidden">
       {/* Chat Window */}
       {isOpen && (
         <div className="bg-white w-80 md:w-96 h-[500px] rounded-3xl shadow-2xl border border-blue-100 flex flex-col overflow-hidden mb-4 pointer-events-auto animate-fade-in-up">

@@ -99,41 +99,55 @@ const ResultScreen: React.FC<Props> = ({ profile, records, onRestart, onRetry })
         `- [${r.category}] 문제유형: ${r.tags.join(', ')} / 오답: ${r.selectedOption}`
       ).slice(0, 15).join('\n');
 
+      // --- DYNAMIC PERSONA SETTING BASED ON LEVEL ---
+      let personaInstruction = "";
+      if (profile.level === 'beginner') {
+          personaInstruction = `
+            [난이도 설정: Beginner(왕초보/기초반)]
+            1. **페르소나**: 친절하고 따뜻한 멘토 선생님. (절대 혼내거나 겁주지 말 것)
+            2. **톤앤매너**: "아직 기초가 부족하지만 할 수 있어!"라는 희망적인 메시지. 어려운 문법 용어 사용을 지양하고 쉽게 풀어서 설명.
+            3. **진단 포인트**: 영어에 대한 흥미를 잃지 않도록 격려 위주.
+            4. **처방**: 하루 10분 단어 외우기, 짧은 문장 읽어보기 등 아주 쉽고 구체적인 '작은 습관' 제시.
+          `;
+      } else if (profile.level === 'standard') {
+          personaInstruction = `
+            [난이도 설정: Standard(표준/내신대비반)]
+            1. **페르소나**: 꼼꼼하고 체계적인 학교/학원 선생님.
+            2. **톤앤매너**: 차분하게 잘한 점과 부족한 점을 짚어주는 객관적인 태도.
+            3. **진단 포인트**: 학교 내신 시험에서 감점될 수 있는 실수들을 교정.
+            4. **처방**: 교과서 본문 암기, 문법 개념 정리, 오답 노트 습관화 등 실질적인 학습법 제시.
+          `;
+      } else { // advanced
+          personaInstruction = `
+            [난이도 설정: Advanced(심화/특목고반)]
+            1. **페르소나**: 대치동 1타 입시 컨설턴트 (Dr. English 본캐).
+            2. **톤앤매너**: 매우 냉철하고 분석적이며 단호함. 충격요법 필요. "이대로는 특목고 힘듭니다" 같은 뼈 때리는 조언.
+            3. **진단 포인트**: 고등 내신 1등급 및 수능 킬러 문항 대비를 위한 고차원적인 분석.
+            4. **처방**: 구문 정밀 독해(Syntax), 고난도 어휘 확장, 논리적 추론 훈련 등 고강도 커리큘럼 제시.
+          `;
+      }
+
       const prompt = `
-        System: 당신은 대한민국 교육 특구(대치동, 목동)에서 활동하는 **최상위권 입시 전문 컨설턴트** '닥터 잉글리시'입니다.
-        학부모가 이 리포트를 보고 "바로 과외를 시켜야겠다"고 느낄 정도로 **충격적이고 구체적이며, 전문적인 분석**을 제공해야 합니다.
-        단순한 위로보다는, **냉철한 현실 인식**과 그에 따른 **확실한 해결책**을 제시하세요.
+        System: 당신은 '닥터 잉글리시'라는 AI 영어 진단 전문가입니다. 아래 설정된 난이도별 페르소나에 완벽하게 빙의하여 분석 리포트를 작성하세요.
+
+        ${personaInstruction}
         
-        [분석 대상]
-        - 학생 이름: ${profile.name} (학년: ${profile.grade})
-        - 선택 난이도: ${profile.level === 'beginner' ? '기초반 (왕초보)' : profile.level === 'standard' ? '표준반 (내신대비)' : '심화반 (특목고대비)'}
-        - 종합 점수: ${finalScore}점
-        - 약점 태그(Weakness Tags): ${wrongTags}
-        - 오답 데이터 상세 분석:
+        [학생 정보]
+        - 이름: ${profile.name} (학년: ${profile.grade})
+        - 선택 모드: ${profile.mode}
+        - 종합 점수: ${finalScore}점 (백분위 추정 및 등급 컷 예측에 활용)
+        - 약점 태그: ${wrongTags}
+        - 오답 상세:
         ${wrongQuestionsSummary}
 
-        [작성 가이드라인]
-        1. **톤앤매너**: 매우 정중하지만 단호한 전문가의 말투 ('~해요'체). 신뢰감 있는 어조.
-        2. **서식**: 중요한 키워드, 행동 지침, 문법 용어는 반드시 **이중 별표(**)**로 감싸서 강조하세요. (예: **관계대명사의 계속적 용법**)
-        3. **내용 깊이**: 
-           - "문법 공부하세요" 같은 뻔한 소리 금지. 
-           - "이 문제는 고등 내신 서술형에서 **감점 1순위**입니다" 처럼 구체적인 입시와 연결하세요.
+        [작성 필수 조건]
+        1. **서식**: 중요한 키워드나 강조할 부분은 반드시 **이중 별표(**)**로 감싸서 강조하세요.
+        2. JSON 포맷으로만 응답하세요.
 
         [JSON 출력 필드 설명]
-        1. **diagnosis (종합 소견)**: 
-           - 현재 학생의 위치를 냉정하게 평가하세요.
-           - 이 점수가 학교 시험이라면 대략 **몇 등급** 수준인지 추정해 주세요.
-           - 점수가 높다면 자만을 경계시키고, 낮다면 희망과 경각심을 동시에 주세요.
-        
-        2. **weakness (취약점 정밀 분석)**:
-           - 발견된 약점 태그들이 왜 위험한지 논리적으로 설명하세요.
-           - 단순 실수가 아닌 **개념 구멍**임을 지적하세요.
-           - 예: "단순히 단어를 모르는 게 아니라, **문장 구조(5형식)**를 보는 눈이 없습니다."
-
-        3. **prescription (솔루션 & 처방)**:
-           - **[1단계: 긴급 처방]**, **[2단계: 주간 루틴]**, **[3단계: 장기 플랜]** 으로 나누어 서술하세요.
-           - 구체적인 학습량 제시 (예: "매일 단어 30개 암기", "오답노트에 예문 3개씩 작성").
-           - 부모님이 집에서 어떻게 지도해야 할지(확인해야 할 포인트) 팁을 포함하세요.
+        1. **diagnosis (종합 소견)**: 현재 학생의 위치와 상태를 설정된 페르소나의 말투로 진단.
+        2. **weakness (취약점 분석)**: 왜 틀렸는지, 어떤 개념이 부족한지 구체적으로 지적. (난이도에 따라 설명 깊이 조절)
+        3. **prescription (솔루션)**: [1단계], [2단계], [3단계]로 나누어 수준에 맞는 학습법 처방.
 
         [Output Format (JSON Only)]
         {
@@ -148,7 +162,7 @@ const ResultScreen: React.FC<Props> = ({ profile, records, onRestart, onRetry })
         const response = await ai.models.generateContent({
           model: 'gemini-3-flash-preview',
           contents: prompt,
-          config: { responseMimeType: "application/json", temperature: 0.75 }
+          config: { responseMimeType: "application/json", temperature: 0.7 }
         });
         
         const text = response.text || "{}";
@@ -178,36 +192,66 @@ const ResultScreen: React.FC<Props> = ({ profile, records, onRestart, onRetry })
     { subject: '구문', MyScore: (scores.syntax / Math.max(records.filter(r => r.category === 'Syntax').length * 5, 1)) * 100, Top10: 90 },
   ];
 
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const today = new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
+
   return (
-    <div className="max-w-4xl mx-auto bg-slate-50 min-h-screen pb-12 font-sans">
+    <div className="max-w-4xl mx-auto bg-slate-50 min-h-screen pb-12 font-sans print:bg-white print:p-0">
+       {/* CSS for printing */}
+      <style>
+        {`
+          @media print {
+            @page { margin: 10mm; }
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .no-break { break-inside: avoid; }
+          }
+        `}
+      </style>
+
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
+      <div className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10 print:static print:shadow-none print:border-b-2 print:border-black">
         <div className="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
-          <h1 className="text-xl font-extrabold text-slate-800 flex items-center gap-2 tracking-tight">
-            🏥 Dr. English <span className="text-xs bg-slate-800 text-white px-2 py-0.5 rounded shadow-sm">Premium Report</span>
-          </h1>
-          <button onClick={onRestart} className="text-sm text-slate-500 hover:text-slate-900 font-medium transition">
-            ✕ 닫기
-          </button>
+          <div className="flex flex-col">
+            <h1 className="text-xl font-extrabold text-slate-800 flex items-center gap-2 tracking-tight">
+              🏥 Dr. English <span className="text-xs bg-slate-800 text-white px-2 py-0.5 rounded shadow-sm print:hidden">Premium Report</span>
+            </h1>
+            <span className="text-xs text-slate-500 hidden print:block mt-1">발급일: {today} | 학생명: {profile.name}</span>
+          </div>
+          
+          <div className="flex gap-2">
+            <button 
+              onClick={handlePrint} 
+              className="text-sm font-bold bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition flex items-center gap-2 print:hidden"
+            >
+              <span>📄 PDF 내보내기</span>
+            </button>
+            <button onClick={onRestart} className="text-sm text-slate-500 hover:text-slate-900 font-medium transition print:hidden">
+              ✕ 닫기
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="p-6 space-y-8">
+      <div className="p-6 space-y-8 print:p-0 print:space-y-6">
         {/* Score Card */}
-        <section className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 flex flex-col md:flex-row items-center gap-10 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
+        <section className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 flex flex-col md:flex-row items-center gap-10 relative overflow-hidden print:shadow-none print:border print:border-slate-300 no-break">
+          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 print:hidden"></div>
           <div className="text-center md:text-left flex-1 z-10">
             <h2 className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-3">Diagnostic Result</h2>
             <div className="flex items-end justify-center md:justify-start gap-4">
               <span className="text-7xl font-black text-slate-900 tracking-tighter">{finalScore}</span>
               <span className="text-2xl text-slate-300 font-bold mb-3">/ 100</span>
             </div>
-            <div className={`mt-5 inline-flex items-center gap-2 px-5 py-2 rounded-full border-2 ${tierColor} font-bold text-sm shadow-sm`}>
+            <div className={`mt-5 inline-flex items-center gap-2 px-5 py-2 rounded-full border-2 ${tierColor} font-bold text-sm shadow-sm print:border-2`}>
               <span>🏆 {tier} Class</span>
             </div>
-            <p className="text-xs text-slate-400 mt-3 font-medium">* 목동 학군 기준 백분위 추정</p>
+            <p className="text-xs text-slate-400 mt-3 font-medium print:text-slate-600">* 목동 학군 기준 백분위 추정</p>
           </div>
-          <div className="w-full md:w-1/2 h-56 z-10">
+          {/* Added min-w-0 to prevent flexbox overflow issues for chart container */}
+          <div className="w-full md:w-1/2 h-56 z-10 min-w-0">
              <ResponsiveContainer width="100%" height="100%">
                <BarChart data={chartData} layout="vertical" barSize={16} margin={{ left: 40, right: 20 }}>
                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
@@ -223,10 +267,11 @@ const ResultScreen: React.FC<Props> = ({ profile, records, onRestart, onRetry })
         </section>
 
         {/* Radar & AI Diagnosis */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-           <div className="bg-white rounded-3xl shadow-lg p-6 border border-slate-100 flex flex-col">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 print:grid-cols-2 print:gap-4">
+           <div className="bg-white rounded-3xl shadow-lg p-6 border border-slate-100 flex flex-col print:shadow-none print:border print:border-slate-300 no-break">
              <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2">📊 영역별 밸런스</h3>
-             <div className="flex-1 min-h-[250px]">
+             {/* Updated container with w-full and min-w-0 for Recharts stability */}
+             <div className="flex-1 h-[250px] w-full min-w-0">
                <ResponsiveContainer width="100%" height="100%">
                  <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
                    <PolarGrid stroke="#e2e8f0" />
@@ -239,7 +284,7 @@ const ResultScreen: React.FC<Props> = ({ profile, records, onRestart, onRetry })
              </div>
            </div>
 
-           <div className="bg-white rounded-3xl shadow-lg p-6 border border-slate-100 flex flex-col">
+           <div className="bg-white rounded-3xl shadow-lg p-6 border border-slate-100 flex flex-col print:shadow-none print:border print:border-slate-300 no-break">
              <h3 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">🩺 Dr. English 소견</h3>
              {isLoading ? (
                <div className="flex-1 flex flex-col items-center justify-center text-slate-400 min-h-[200px]">
@@ -247,8 +292,8 @@ const ResultScreen: React.FC<Props> = ({ profile, records, onRestart, onRetry })
                  <span className="text-sm font-medium animate-pulse">상위 1% 전문가가 분석 중...</span>
                </div>
              ) : (
-               <div className="flex-1 bg-slate-50 rounded-2xl p-6 text-slate-700 text-[15px] leading-7 shadow-inner flex flex-col justify-center border border-slate-100">
-                 <p>{aiAnalysis && <HighlightedText text={aiAnalysis.diagnosis} colorClass="text-blue-700 bg-blue-100" />}</p>
+               <div className="flex-1 bg-slate-50 rounded-2xl p-6 text-slate-700 text-[15px] leading-7 shadow-inner flex flex-col justify-center border border-slate-100 print:shadow-none print:border-0 print:p-0">
+                 <p>{aiAnalysis && <HighlightedText text={aiAnalysis.diagnosis} colorClass="text-blue-700 bg-blue-100 print:bg-transparent print:text-blue-800" />}</p>
                </div>
              )}
            </div>
@@ -256,29 +301,29 @@ const ResultScreen: React.FC<Props> = ({ profile, records, onRestart, onRetry })
 
         {/* Detailed AI Analysis */}
         {!isLoading && aiAnalysis && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in-up">
-            <div className="bg-white rounded-3xl shadow-lg border border-slate-100 overflow-hidden">
-               <div className="bg-red-50 px-6 py-4 border-b border-red-100 flex items-center gap-2">
-                 <span className="text-xl">⚠️</span> <h3 className="text-red-900 font-bold">취약점 정밀 분석</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in-up print:block print:space-y-4">
+            <div className="bg-white rounded-3xl shadow-lg border border-slate-100 overflow-hidden print:shadow-none print:border print:border-slate-300 no-break">
+               <div className="bg-red-50 px-6 py-4 border-b border-red-100 flex items-center gap-2 print:bg-gray-100 print:border-gray-300">
+                 <span className="text-xl">⚠️</span> <h3 className="text-red-900 font-bold print:text-black">취약점 정밀 분석</h3>
                </div>
-               <div className="p-6 text-slate-700 leading-relaxed"><HighlightedText text={aiAnalysis.weakness} colorClass="text-red-600 bg-red-50" /></div>
+               <div className="p-6 text-slate-700 leading-relaxed"><HighlightedText text={aiAnalysis.weakness} colorClass="text-red-600 bg-red-50 print:bg-transparent print:text-red-700" /></div>
             </div>
-            <div className="bg-white rounded-3xl shadow-lg border border-slate-100 overflow-hidden">
-               <div className="bg-emerald-50 px-6 py-4 border-b border-emerald-100 flex items-center gap-2">
-                 <span className="text-xl">💊</span> <h3 className="text-emerald-900 font-bold">솔루션 & 처방전</h3>
+            <div className="bg-white rounded-3xl shadow-lg border border-slate-100 overflow-hidden print:shadow-none print:border print:border-slate-300 no-break mt-6 md:mt-0 print:mt-4">
+               <div className="bg-emerald-50 px-6 py-4 border-b border-emerald-100 flex items-center gap-2 print:bg-gray-100 print:border-gray-300">
+                 <span className="text-xl">💊</span> <h3 className="text-emerald-900 font-bold print:text-black">솔루션 & 처방전</h3>
                </div>
-               <div className="p-6 text-slate-700 leading-relaxed"><HighlightedText text={aiAnalysis.prescription} colorClass="text-emerald-700 bg-emerald-50" /></div>
+               <div className="p-6 text-slate-700 leading-relaxed"><HighlightedText text={aiAnalysis.prescription} colorClass="text-emerald-700 bg-emerald-50 print:bg-transparent print:text-emerald-700" /></div>
             </div>
           </div>
         )}
 
         {/* --- REVIEW LIST (ODAP NOTE) --- */}
         {wrongRecords.length > 0 && (
-            <div className="bg-white rounded-3xl shadow-lg border border-slate-200 overflow-hidden mt-8 animate-slide-up">
-                <div className="bg-gray-100 px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <div className="bg-white rounded-3xl shadow-lg border border-slate-200 overflow-hidden mt-8 animate-slide-up print:shadow-none print:border print:border-slate-300">
+                <div className="bg-gray-100 px-6 py-4 border-b border-gray-200 flex items-center justify-between print:bg-gray-200">
                     <h3 className="font-extrabold text-gray-800 text-lg flex items-center gap-2">
                         📝 오답 노트 (Review Note)
-                        <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">{wrongRecords.length}개 틀림</span>
+                        <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full print:bg-black print:text-white">{wrongRecords.length}개 틀림</span>
                     </h3>
                 </div>
                 <div className="divide-y divide-gray-100">
@@ -286,7 +331,7 @@ const ResultScreen: React.FC<Props> = ({ profile, records, onRestart, onRetry })
                         // Find original question for explanation and correct answer text
                         const originalQ = QUESTIONS.find(q => q.id === record.questionId);
                         return (
-                            <div key={idx} className="p-6 hover:bg-gray-50 transition">
+                            <div key={idx} className="p-6 hover:bg-gray-50 transition print:break-inside-avoid">
                                 <div className="flex items-center gap-2 mb-2 text-xs font-bold text-gray-400 uppercase">
                                     <span className="bg-gray-200 px-2 py-1 rounded text-gray-600">{record.category}</span>
                                     <span>난이도 {record.difficulty}</span>
@@ -294,16 +339,16 @@ const ResultScreen: React.FC<Props> = ({ profile, records, onRestart, onRetry })
                                 <p className="font-bold text-gray-800 mb-3 text-lg">{record.questionText}</p>
                                 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
-                                    <div className="bg-red-50 border border-red-200 p-3 rounded-lg">
+                                    <div className="bg-red-50 border border-red-200 p-3 rounded-lg print:border-gray-300">
                                         <span className="text-xs font-bold text-red-500 block mb-1">내가 고른 답</span>
                                         <span className="text-red-900 font-medium">{record.selectedOption}</span>
                                     </div>
-                                    <div className="bg-green-50 border border-green-200 p-3 rounded-lg">
+                                    <div className="bg-green-50 border border-green-200 p-3 rounded-lg print:border-gray-300">
                                         <span className="text-xs font-bold text-green-600 block mb-1">정답</span>
                                         <span className="text-green-900 font-medium">{originalQ?.correct_answer || "확인 필요"}</span>
                                     </div>
                                 </div>
-                                <div className="bg-slate-50 p-4 rounded-xl text-sm text-slate-600 border border-slate-100">
+                                <div className="bg-slate-50 p-4 rounded-xl text-sm text-slate-600 border border-slate-100 print:bg-white print:border-gray-200">
                                     <span className="font-bold text-slate-800 mr-2">💡 해설:</span>
                                     {originalQ?.explanation}
                                 </div>
@@ -314,8 +359,8 @@ const ResultScreen: React.FC<Props> = ({ profile, records, onRestart, onRetry })
             </div>
         )}
 
-        {/* Footer Actions */}
-        <div className="pt-4 pb-8 flex flex-col md:flex-row gap-4">
+        {/* Footer Actions (Hidden when printing) */}
+        <div className="pt-4 pb-8 flex flex-col md:flex-row gap-4 print:hidden">
           {wrongRecords.length > 0 && (
              <button
                 onClick={() => onRetry(wrongQuestionIds)}
