@@ -29,6 +29,8 @@ const App: React.FC = () => {
       baseQuestions = baseQuestions.filter(q => q.category === 'Grammar' || q.category === 'Structure');
     } else if (profile.mode === 'reading') {
       baseQuestions = baseQuestions.filter(q => q.category === 'Reading');
+    } else if (profile.mode === 'syntax') {
+      baseQuestions = baseQuestions.filter(q => q.category === 'Syntax');
     }
 
     // 2. Filter by Level (Difficulty) - STRICT MODE
@@ -38,6 +40,12 @@ const App: React.FC = () => {
     } 
     else if (profile.level === 'standard') {
       let pool = baseQuestions.filter(q => q.difficulty === 1 || q.difficulty === 2);
+      
+      // If syntax mode and standard, allow difficulty 3 questions as well for better diagnosis
+      if (profile.mode === 'syntax') {
+         pool = baseQuestions.filter(q => q.difficulty === 1 || q.difficulty === 2 || q.difficulty === 3);
+      }
+
       if (pool.length < 5) {
          const padding = baseQuestions.filter(q => q.difficulty === 0);
          const currentIds = new Set(pool.map(q => q.id));

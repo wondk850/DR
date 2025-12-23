@@ -30,6 +30,7 @@ const WelcomeScreen: React.FC<Props> = ({ onComplete }) => {
 
   const modes: { id: TestMode; label: string; icon: string; desc: string }[] = [
     { id: 'comprehensive', label: '종합 정밀 진단', icon: '🏥', desc: '신서중 2학년 내신 완벽 대비' },
+    { id: 'syntax', label: '구문 정밀 독해 (NEW)', icon: '🔎', desc: '주어 찾기, 후치수식, 끊어읽기' },
     { id: 'grammar', label: '문법 집중 케어', icon: '⚡', desc: '5형식, 관계사, 수동태, 가정법' },
     { id: 'reading', label: '독해 심화 분석', icon: '📖', desc: '추론, 순서배열, 내용일치' },
     { id: 'vocabulary', label: '어휘력 테스트', icon: '📚', desc: '영영풀이, 다의어, 파생어' },
@@ -40,7 +41,7 @@ const WelcomeScreen: React.FC<Props> = ({ onComplete }) => {
       <div className="text-center mb-6">
         <div className="text-5xl mb-3 animate-bounce">👨‍⚕️</div>
         <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">닥터 잉글리시</h1>
-        <p className="text-blue-600 font-bold mt-2 text-lg">Ver 6.3 (Strict Level System)</p>
+        <p className="text-blue-600 font-bold mt-2 text-lg">Ver 8.0 (Syntax Engine)</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -157,7 +158,7 @@ const WelcomeScreen: React.FC<Props> = ({ onComplete }) => {
         <div>
           <label className="block text-sm font-bold text-gray-700 mb-2">가장 고민인 부분은? (여러 개 선택 가능)</label>
           <div className="grid grid-cols-2 gap-2">
-            {(['단어암기', '문장만들기', '긴글읽기', '문법용어'] as WeaknessType[]).map((w) => {
+            {(['단어암기', '문장만들기', '긴글읽기', '문법용어', '후치수식', '주어찾기'] as WeaknessType[]).map((w) => {
               const isSelected = weaknesses.includes(w);
               return (
                 <button

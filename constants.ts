@@ -137,7 +137,7 @@ export const QUESTIONS: Question[] = [
     }
   },
 
-  // --- 기존 Advanced & Standard 문제 유지 ---
+  // --- 기존 Advanced & Standard 문제 ---
   {
     "id": 1,
     "category": "Grammar",
@@ -522,7 +522,7 @@ export const QUESTIONS: Question[] = [
     "options": ["I will do _____ I want.", "Show me _____ you bought.", "This is _____ I made.", "This is the thing _____ I made."],
     "correct_answer": "This is the thing _____ I made.",
     "tags": ["grm_what", "grm_relative"],
-    "explanation": "What은 선행사를 포함한 관계대명사(=the thing which)입니다. 4번은 이미 선행사 'the thing'이 있으므로 what을 쓸 수 없고 which나 that을 써야 합니다.",
+    "explanation": "What은 선행사가 포함한 관계대명사(=the thing which)입니다. 4번은 이미 선행사 'the thing'이 있으므로 what을 쓸 수 없고 which나 that을 써야 합니다.",
     "wrong_feedback": {
       "This is _____ I made.": "This is (the thing which) I made. = This is what I made. 가능해."
     }
@@ -672,6 +672,203 @@ export const QUESTIONS: Question[] = [
     "explanation": "명령문은 주어(You)를 생략하고 동사원형으로 시작합니다. (예: Open the door)",
     "wrong_feedback": {
       "주어(You)": "명령문에서는 주어를 생략해."
+    }
+  },
+
+  // --- SYNTAX MASTER (New Mode: 구문 독해 & 후치 수식 킬러) ---
+  {
+    "id": 201,
+    "category": "Syntax",
+    "difficulty": 2,
+    "question_text": "[주어 찾기] 다음 문장의 진짜 주어는 어디까지인가?\n'To master English grammar is not easy.'",
+    "options": ["To", "To master", "To master English", "To master English grammar"],
+    "correct_answer": "To master English grammar",
+    "tags": ["syn_subject_phrase", "syn_to_infinitive"],
+    "explanation": "동사(is) 앞부분 전체가 주어입니다. 'To master(배우는 것) + English grammar(영어 문법을)' 전체가 명사구 주어 역할을 합니다.",
+    "wrong_feedback": {
+      "To master English": "'grammar'까지가 master의 목적어로 주어부에 포함돼."
+    }
+  },
+  {
+    "id": 202,
+    "category": "Syntax",
+    "difficulty": 3,
+    "question_text": "[주어 찾기] 다음 문장의 주어로 알맞은 해석은?\n'What you need right now is confidence.'",
+    "options": ["무엇이 필요한지", "너는 지금 필요하다", "네가 지금 필요한 것은", "필요한 자신감은"],
+    "correct_answer": "네가 지금 필요한 것은",
+    "tags": ["syn_subject_clause", "syn_what"],
+    "explanation": "관계대명사 What절이 주어입니다. 'What you need(네가 필요한 것)'로 해석하며 단수 취급합니다.",
+    "wrong_feedback": {
+      "무엇이 필요한지": "의문사가 아니라 관계대명사로 해석하는 것이 문맥상 더 자연스러워."
+    }
+  },
+  {
+    "id": 203,
+    "category": "Syntax",
+    "difficulty": 2,
+    "question_text": "[후치 수식] 밑줄 친 부분의 올바른 수식 관계는?\n'The girl **playing the piano** is my sister.'",
+    "options": ["소녀는 피아노를 연주하고 있다.", "피아노를 연주하는 소녀", "피아노를 연주하는 것은", "소녀가 피아노를 연주해서"],
+    "correct_answer": "피아노를 연주하는 소녀",
+    "tags": ["syn_post_mod_ing", "syn_participle"],
+    "explanation": "현재분사(playing)가 명사(The girl) 뒤에서 수식합니다. '~하는(능동)'으로 해석합니다.",
+    "wrong_feedback": {
+      "소녀는 피아노를 연주하고 있다.": "동사(is playing)가 아니라 수식어(playing)야. 진짜 동사는 뒤에 있는 is야."
+    }
+  },
+  {
+    "id": 204,
+    "category": "Syntax",
+    "difficulty": 3,
+    "question_text": "[후치 수식] 다음 문장의 올바른 해석은?\n'The letter **written in English** is hard to read.'",
+    "options": ["그 편지는 영어로 썼다.", "영어로 쓴 편지", "영어로 쓰여진 편지", "편지를 영어로 쓰면"],
+    "correct_answer": "영어로 쓰여진 편지",
+    "tags": ["syn_post_mod_pp", "syn_participle"],
+    "explanation": "과거분사(written)가 뒤에서 수식합니다. 편지는 쓰여지는 대상이므로 수동(written)으로 해석합니다.",
+    "wrong_feedback": {
+      "그 편지는 영어로 썼다.": "편지가 스스로 쓸 수 없어. 수동태 의미인 '쓰여진'이 맞아."
+    }
+  },
+  {
+    "id": 205,
+    "category": "Syntax",
+    "difficulty": 2,
+    "question_text": "[후치 수식] 다음 중 밑줄 친 부분의 역할이 다른 하나는?\n(1) The book **on the desk** is mine.\n(2) The baby **sleeping in the bed** is cute.\n(3) I have a friend **to help me**.\n(4) I know **that he is rich**.",
+    "options": ["(1)", "(2)", "(3)", "(4)"],
+    "correct_answer": "(4)",
+    "tags": ["syn_structure_diff", "syn_clause_vs_phrase"],
+    "explanation": "(1), (2), (3)은 모두 앞의 명사를 꾸며주는 형용사구(전명구, 분사구, To부정사구)입니다. (4)는 동사 know의 목적어 역할을 하는 명사절입니다.",
+    "wrong_feedback": {
+      "(1)": "전명구로 book을 꾸며주는 후치 수식어야."
+    }
+  },
+  {
+    "id": 206,
+    "category": "Syntax",
+    "difficulty": 3,
+    "question_text": "[구조 파악] 다음 문장에서 동사(Verb)를 찾으세요.\n'The man who lives next door likes spicy food.'",
+    "options": ["lives", "lives next", "likes", "likes spicy"],
+    "correct_answer": "likes",
+    "tags": ["syn_main_verb", "syn_relative_clause"],
+    "explanation": "문장의 진짜 동사는 likes입니다. lives는 관계대명사절(who lives next door) 안의 동사일 뿐입니다.",
+    "wrong_feedback": {
+      "lives": "그건 수식어구(관계사절) 안에 있는 동사야. 주어(The man)의 진짜 동사를 찾아봐."
+    }
+  },
+  {
+    "id": 207,
+    "category": "Syntax",
+    "difficulty": 3,
+    "question_text": "[해석] 다음 문장의 정확한 의미는?\n'She has the ability to solve the problem.'",
+    "options": ["그녀는 문제를 풀기 위해 능력이 있다.", "그녀는 문제를 푸는 능력이다.", "그녀는 문제를 해결할 능력이 있다.", "그녀의 능력은 문제를 푸는 것이다."],
+    "correct_answer": "그녀는 문제를 해결할 능력이 있다.",
+    "tags": ["syn_to_adjective", "syn_post_mod_to"],
+    "explanation": "Ability to solve는 '해결할 능력'으로 To부정사가 형용사처럼 명사를 꾸며줍니다.",
+    "wrong_feedback": {
+      "그녀는 문제를 풀기 위해 능력이 있다.": "부사적 용법(목적)이 아니라 형용사적 용법이야."
+    }
+  },
+  {
+    "id": 208,
+    "category": "Syntax",
+    "difficulty": 3,
+    "question_text": "[구문 분석] 가목적어 it이 쓰인 문장은?",
+    "options": ["I like it very much.", "It is raining outside.", "I found it easy to solve the math problem.", "It was yesterday that I met him."],
+    "correct_answer": "I found it easy to solve the math problem.",
+    "tags": ["syn_complex_object", "syn_it"],
+    "explanation": "5형식 문장(found + it + easy + to...)에서 it은 가목적어, to solve...가 진목적어입니다. 2번은 비인칭, 4번은 강조구문입니다.",
+    "wrong_feedback": {
+      "It was yesterday that I met him.": "이건 It ~ that 강조 구문이야."
+    }
+  },
+  {
+    "id": 209,
+    "category": "Syntax",
+    "difficulty": 2,
+    "question_text": "[어순 배열] '나는 그가 정직하다고 믿는다'를 영어로 바르게 쓴 것은?",
+    "options": ["I believe him honest.", "I believe honest him.", "I believe him is honest.", "I believe he honest."],
+    "correct_answer": "I believe him honest.",
+    "tags": ["syn_5form_order", "syn_structure"],
+    "explanation": "5형식 문장입니다. 주어(I) + 동사(believe) + 목적어(him) + 목적격보어(honest).",
+    "wrong_feedback": {
+      "I believe honest him.": "목적어(him)가 먼저 나오고 보어(honest)가 뒤에 와야 해."
+    }
+  },
+  {
+    "id": 210,
+    "category": "Syntax",
+    "difficulty": 3,
+    "question_text": "[후치 수식] 다음 중 생략된 단어가 있는 곳은?\n'The car (A) I bought yesterday (B) is (C) very expensive.'",
+    "options": ["(A)", "(B)", "(C)", "없음"],
+    "correct_answer": "(A)",
+    "tags": ["syn_relative_omission", "syn_structure"],
+    "explanation": "The car (which/that) I bought... 목적격 관계대명사가 명사(car)와 주어(I) 사이 (A)에 생략되어 있습니다. '명사 + 주어 + 동사' 패턴은 100% 수식입니다.",
+    "wrong_feedback": {
+      "없음": "명사 뒤에 바로 주어 동사가 나오면 관계대명사가 생략된 거야."
+    }
+  },
+  {
+    "id": 211,
+    "category": "Syntax",
+    "difficulty": 3,
+    "question_text": "[해석] 분사구문의 올바른 해석은?\n'Turning left, you will find the bank.'",
+    "options": ["왼쪽으로 돌고 있는 너는", "왼쪽으로 돌자마자", "왼쪽으로 돈다면", "왼쪽으로 돌았기 때문에"],
+    "correct_answer": "왼쪽으로 돈다면",
+    "tags": ["syn_participle_clause", "syn_logic"],
+    "explanation": "문맥상 조건(If you turn left)으로 해석하는 것이 가장 자연스럽습니다.",
+    "wrong_feedback": {
+      "왼쪽으로 돌고 있는 너는": "콤마(,)가 있으면 수식이 아니라 분사구문(부사절)으로 해석해야 해."
+    }
+  },
+  {
+    "id": 212,
+    "category": "Syntax",
+    "difficulty": 3,
+    "question_text": "[구문 분석] 'It ~ to' 가주어 진주어 구문이 아닌 것은?",
+    "options": ["It is fun to watch movies.", "It is important to study hard.", "It seems that he is rich.", "It is time to go to bed."],
+    "correct_answer": "It seems that he is rich.",
+    "tags": ["syn_it_to", "syn_structure"],
+    "explanation": "It seems that... 은 가주어 it과 명사절(that절) 진주어 구문이거나 비인칭 주어 구문으로 분류됩니다. 나머지는 모두 It ~ to 부정사 구문입니다.",
+    "wrong_feedback": {
+      "It is fun to watch movies.": "가주어(It) - 진주어(to watch) 맞아."
+    }
+  },
+  {
+    "id": 213,
+    "category": "Syntax",
+    "difficulty": 3,
+    "question_text": "[어순 배열] 간접의문문 어순이 바른 것은?",
+    "options": ["I don't know where does he live.", "I don't know where he lives.", "I don't know where lives he.", "I don't know where is he living."],
+    "correct_answer": "I don't know where he lives.",
+    "tags": ["syn_indirect_question", "syn_word_order"],
+    "explanation": "의문사 + 주어 + 동사(평서문 어순)가 되어야 합니다. where he lives.",
+    "wrong_feedback": {
+      "I don't know where does he live.": "does를 쓰면 안 되고 평서문처럼 동사에 s를 붙여야 해."
+    }
+  },
+  {
+    "id": 214,
+    "category": "Syntax",
+    "difficulty": 2,
+    "question_text": "[동사 찾기] 다음 문장의 본동사는?\n'Thinking about the future makes me happy.'",
+    "options": ["Thinking", "about", "makes", "happy"],
+    "correct_answer": "makes",
+    "tags": ["syn_main_verb", "syn_gerund_subject"],
+    "explanation": "주어는 동명사구(Thinking about the future)이고, 본동사는 makes입니다. 동명사 주어는 단수 취급하여 s를 붙입니다.",
+    "wrong_feedback": {
+      "Thinking": "Thinking은 주어 역할을 하는 동명사야."
+    }
+  },
+  {
+    "id": 215,
+    "category": "Syntax",
+    "difficulty": 3,
+    "question_text": "[관계사 해석] 콤마(,) 뒤의 관계대명사 해석법은?\n'I met Tom, who likes soccer.'",
+    "options": ["축구를 좋아하는 톰을 만났다.", "나는 톰을 만났고, 그는 축구를 좋아한다.", "내가 만난 톰은 축구를 좋아한다.", "축구를 좋아하는 사람은 톰이다."],
+    "correct_answer": "나는 톰을 만났고, 그는 축구를 좋아한다.",
+    "tags": ["syn_relative_continuous", "syn_interpretation"],
+    "explanation": "계속적 용법(콤마+who)은 '그런데 그는(and he)'으로 풀어서 순차적으로 해석합니다.",
+    "wrong_feedback": {
+      "축구를 좋아하는 톰을 만났다.": "그건 한정적 용법(콤마 없음)의 해석이야."
     }
   }
 ];

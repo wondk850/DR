@@ -1,8 +1,9 @@
+
 export type GradeLevel = '중1' | '중2' | '중3';
 export type ConfidenceLevel = '😫바닥' | '😕불안' | '😐보통' | '🙂괜찮음' | '😎자신만만';
-export type WeaknessType = '단어암기' | '문장만들기' | '긴글읽기' | '문법용어';
-export type TestMode = 'comprehensive' | 'grammar' | 'reading' | 'vocabulary';
-export type TargetLevel = 'beginner' | 'standard' | 'advanced'; // Added 'beginner'
+export type WeaknessType = '단어암기' | '문장만들기' | '긴글읽기' | '문법용어' | '후치수식' | '주어찾기'; // Added new types
+export type TestMode = 'comprehensive' | 'grammar' | 'reading' | 'vocabulary' | 'syntax'; // Added 'syntax'
+export type TargetLevel = 'beginner' | 'standard' | 'advanced';
 
 export interface UserProfile {
   name: string;
@@ -15,8 +16,8 @@ export interface UserProfile {
 
 export interface Question {
   id: number;
-  category: 'Vocabulary' | 'Structure' | 'Reading' | 'Grammar';
-  difficulty: 0 | 1 | 2 | 3; // Added 0 for beginner questions
+  category: 'Vocabulary' | 'Structure' | 'Reading' | 'Grammar' | 'Syntax'; // Added Syntax
+  difficulty: 0 | 1 | 2 | 3;
   question_text: string;
   options: string[];
   correct_answer: string;
@@ -44,4 +45,5 @@ export interface ScoreBoard {
   structure: number;
   reading: number;
   grammar: number;
+  syntax: number; // Added syntax score
 }

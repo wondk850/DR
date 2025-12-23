@@ -16,11 +16,11 @@ const HighlightedText: React.FC<{ text: string; colorClass?: string }> = ({ text
   if (!text) return null;
   const parts = text.split(/(\*\*.*?\*\*)/g);
   return (
-    <span className="leading-relaxed">
+    <span className="leading-relaxed whitespace-pre-line">
       {parts.map((part, i) => {
         if (part.startsWith('**') && part.endsWith('**')) {
           return (
-            <span key={i} className={`font-black mx-0.5 px-1.5 py-0.5 rounded ${colorClass}`}>
+            <span key={i} className={`font-black mx-0.5 px-1.5 py-0.5 rounded ${colorClass} text-[0.95em]`}>
               {part.slice(2, -2)}
             </span>
           );
@@ -34,7 +34,15 @@ const HighlightedText: React.FC<{ text: string; colorClass?: string }> = ({ text
 const ResultScreen: React.FC<Props> = ({ profile, records, onRestart, onRetry }) => {
   // --- Scoring Logic ---
   const scores = useMemo(() => {
-    const board: ScoreBoard = { total: 0, maxTotal: records.length * 5, vocab: 0, structure: 0, reading: 0, grammar: 0 };
+    const board: ScoreBoard = { 
+      total: 0, 
+      maxTotal: records.length * 5, 
+      vocab: 0, 
+      structure: 0, 
+      reading: 0, 
+      grammar: 0, 
+      syntax: 0 
+    };
     const pointsPerQuestion = 5;
 
     records.forEach(r => {
@@ -44,6 +52,7 @@ const ResultScreen: React.FC<Props> = ({ profile, records, onRestart, onRetry })
         if (r.category === 'Structure') board.structure += pointsPerQuestion;
         if (r.category === 'Reading') board.reading += pointsPerQuestion;
         if (r.category === 'Grammar') board.grammar += pointsPerQuestion;
+        if (r.category === 'Syntax') board.syntax += pointsPerQuestion;
       }
     });
     return board;
@@ -88,29 +97,49 @@ const ResultScreen: React.FC<Props> = ({ profile, records, onRestart, onRetry })
 
       const wrongQuestionsSummary = wrongRecords.map(r => 
         `- [${r.category}] 문제유형: ${r.tags.join(', ')} / 오답: ${r.selectedOption}`
-      ).slice(0, 10).join('\n');
+      ).slice(0, 15).join('\n');
 
       const prompt = `
-        System: 당신은 대한민국 목동 학원가에서 가장 비싸고 유능한 '영어 입시 전문 컨설턴트'입니다.
+        System: 당신은 대한민국 교육 특구(대치동, 목동)에서 활동하는 **최상위권 입시 전문 컨설턴트** '닥터 잉글리시'입니다.
+        학부모가 이 리포트를 보고 "바로 과외를 시켜야겠다"고 느낄 정도로 **충격적이고 구체적이며, 전문적인 분석**을 제공해야 합니다.
+        단순한 위로보다는, **냉철한 현실 인식**과 그에 따른 **확실한 해결책**을 제시하세요.
         
-        [필수 요청 사항]
-        1. **말투**: 매우 전문적이고, 냉철하며, 신뢰감을 주는 '해요'체를 사용하세요.
-        2. **강조**: 중요한 키워드(취약한 문법 용어, 심각성, 핵심 전략 등)는 반드시 **이중 별표**로 감싸주세요. (예: **관계대명사**, **심각한 수준**)
-        3. **전문성**: 학생의 점수와 틀린 태그를 바탕으로 구체적인 피드백을 주세요.
-        
-        [Data]
+        [분석 대상]
         - 학생 이름: ${profile.name} (학년: ${profile.grade})
-        - 선택 난이도: ${profile.level === 'beginner' ? '왕기초반' : profile.level === 'standard' ? '기본반' : '심화 실전반'}
-        - 점수: ${finalScore}점
-        - 약점 태그: ${wrongTags}
-        - 오답 상세:
+        - 선택 난이도: ${profile.level === 'beginner' ? '기초반 (왕초보)' : profile.level === 'standard' ? '표준반 (내신대비)' : '심화반 (특목고대비)'}
+        - 종합 점수: ${finalScore}점
+        - 약점 태그(Weakness Tags): ${wrongTags}
+        - 오답 데이터 상세 분석:
         ${wrongQuestionsSummary}
+
+        [작성 가이드라인]
+        1. **톤앤매너**: 매우 정중하지만 단호한 전문가의 말투 ('~해요'체). 신뢰감 있는 어조.
+        2. **서식**: 중요한 키워드, 행동 지침, 문법 용어는 반드시 **이중 별표(**)**로 감싸서 강조하세요. (예: **관계대명사의 계속적 용법**)
+        3. **내용 깊이**: 
+           - "문법 공부하세요" 같은 뻔한 소리 금지. 
+           - "이 문제는 고등 내신 서술형에서 **감점 1순위**입니다" 처럼 구체적인 입시와 연결하세요.
+
+        [JSON 출력 필드 설명]
+        1. **diagnosis (종합 소견)**: 
+           - 현재 학생의 위치를 냉정하게 평가하세요.
+           - 이 점수가 학교 시험이라면 대략 **몇 등급** 수준인지 추정해 주세요.
+           - 점수가 높다면 자만을 경계시키고, 낮다면 희망과 경각심을 동시에 주세요.
+        
+        2. **weakness (취약점 정밀 분석)**:
+           - 발견된 약점 태그들이 왜 위험한지 논리적으로 설명하세요.
+           - 단순 실수가 아닌 **개념 구멍**임을 지적하세요.
+           - 예: "단순히 단어를 모르는 게 아니라, **문장 구조(5형식)**를 보는 눈이 없습니다."
+
+        3. **prescription (솔루션 & 처방)**:
+           - **[1단계: 긴급 처방]**, **[2단계: 주간 루틴]**, **[3단계: 장기 플랜]** 으로 나누어 서술하세요.
+           - 구체적인 학습량 제시 (예: "매일 단어 30개 암기", "오답노트에 예문 3개씩 작성").
+           - 부모님이 집에서 어떻게 지도해야 할지(확인해야 할 포인트) 팁을 포함하세요.
 
         [Output Format (JSON Only)]
         {
-          "diagnosis": "총평. 3문장 이내. 중요 단어 **강조**.",
-          "weakness": "취약점 분석. 불렛 포인트 사용 가능. 문법 용어 **강조**.",
-          "prescription": "학습 로드맵. 단계별 제시. 행동 지침 **강조**."
+          "diagnosis": "...",
+          "weakness": "...",
+          "prescription": "..."
         }
       `;
 
@@ -119,7 +148,7 @@ const ResultScreen: React.FC<Props> = ({ profile, records, onRestart, onRetry })
         const response = await ai.models.generateContent({
           model: 'gemini-3-flash-preview',
           contents: prompt,
-          config: { responseMimeType: "application/json", temperature: 0.7 }
+          config: { responseMimeType: "application/json", temperature: 0.75 }
         });
         
         const text = response.text || "{}";
@@ -146,6 +175,7 @@ const ResultScreen: React.FC<Props> = ({ profile, records, onRestart, onRetry })
     { subject: '구조', MyScore: (scores.structure / Math.max(records.filter(r => r.category === 'Structure').length * 5, 1)) * 100, Top10: 92 },
     { subject: '독해', MyScore: (scores.reading / Math.max(records.filter(r => r.category === 'Reading').length * 5, 1)) * 100, Top10: 98 },
     { subject: '문법', MyScore: (scores.grammar / Math.max(records.filter(r => r.category === 'Grammar').length * 5, 1)) * 100, Top10: 95 },
+    { subject: '구문', MyScore: (scores.syntax / Math.max(records.filter(r => r.category === 'Syntax').length * 5, 1)) * 100, Top10: 90 },
   ];
 
   return (
@@ -214,7 +244,7 @@ const ResultScreen: React.FC<Props> = ({ profile, records, onRestart, onRetry })
              {isLoading ? (
                <div className="flex-1 flex flex-col items-center justify-center text-slate-400 min-h-[200px]">
                  <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-3"></div>
-                 <span className="text-sm font-medium animate-pulse">분석 중...</span>
+                 <span className="text-sm font-medium animate-pulse">상위 1% 전문가가 분석 중...</span>
                </div>
              ) : (
                <div className="flex-1 bg-slate-50 rounded-2xl p-6 text-slate-700 text-[15px] leading-7 shadow-inner flex flex-col justify-center border border-slate-100">
@@ -229,13 +259,13 @@ const ResultScreen: React.FC<Props> = ({ profile, records, onRestart, onRetry })
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in-up">
             <div className="bg-white rounded-3xl shadow-lg border border-slate-100 overflow-hidden">
                <div className="bg-red-50 px-6 py-4 border-b border-red-100 flex items-center gap-2">
-                 <span className="text-xl">⚠️</span> <h3 className="text-red-900 font-bold">취약점 분석</h3>
+                 <span className="text-xl">⚠️</span> <h3 className="text-red-900 font-bold">취약점 정밀 분석</h3>
                </div>
                <div className="p-6 text-slate-700 leading-relaxed"><HighlightedText text={aiAnalysis.weakness} colorClass="text-red-600 bg-red-50" /></div>
             </div>
             <div className="bg-white rounded-3xl shadow-lg border border-slate-100 overflow-hidden">
                <div className="bg-emerald-50 px-6 py-4 border-b border-emerald-100 flex items-center gap-2">
-                 <span className="text-xl">💊</span> <h3 className="text-emerald-900 font-bold">솔루션 & 처방</h3>
+                 <span className="text-xl">💊</span> <h3 className="text-emerald-900 font-bold">솔루션 & 처방전</h3>
                </div>
                <div className="p-6 text-slate-700 leading-relaxed"><HighlightedText text={aiAnalysis.prescription} colorClass="text-emerald-700 bg-emerald-50" /></div>
             </div>
