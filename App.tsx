@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import WelcomeScreen from './components/WelcomeScreen';
 import QuizScreen from './components/QuizScreen';
 import ResultScreen from './components/ResultScreen';
+import ChatBot from './components/ChatBot'; // Import ChatBot
 import { UserProfile, AnswerRecord, Question } from './types';
 import { QUESTIONS } from './constants';
 
@@ -114,7 +115,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 font-sans text-gray-900">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 font-sans text-gray-900 relative">
       {screen === 'welcome' && (
         <WelcomeScreen onComplete={handleStart} />
       )}
@@ -140,6 +141,9 @@ const App: React.FC = () => {
           onRetry={handleRetry}
         />
       )}
+
+      {/* Dr. English AI ChatBot - Available globally */}
+      <ChatBot profile={profile} records={records} />
     </div>
   );
 };
